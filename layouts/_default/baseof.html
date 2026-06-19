@@ -12,6 +12,11 @@
   <header class="site-header">
     <a class="site-title" href="{{ "/" | relURL }}">{{ .Site.Title }}</a>
     <p class="site-tagline">{{ .Site.Params.description }}</p>
+    <nav class="site-nav">
+      <a href="{{ "/" | relURL }}">Home</a>
+      <a href="{{ "/about/" | relURL }}">About Me</a>
+      <a href="{{ "/contact/" | relURL }}">Contact</a>
+    </nav>
   </header>
   <main class="site-main">
     {{ block "main" . }}{{ end }}
