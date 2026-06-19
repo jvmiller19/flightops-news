@@ -22,45 +22,95 @@ THEME = (
     "partnerships signed in the industry."
 )
 
+VOICE = (
+    "Write commentary in the voice of a business development and product "
+    "leader with 15+ years in aviation technology — someone who has "
+    "personally negotiated multi-million-dollar B2B aviation tech deals, "
+    "run global delivery and consulting teams, managed competitive bids, "
+    "and built product roadmaps (flight planning, NOTAMs, international "
+    "expansion) at companies like ForeFlight, SITA, NAVBLUE, Lufthansa "
+    "Systems, and FlightAware. This person is also a licensed private "
+    "pilot. The voice should read as an informed industry insider: "
+    "practical and commercially minded rather than purely technical — "
+    "comment on what a deal or product move means competitively, "
+    "operationally, and for customers, not just what was announced. "
+    "Confident, direct, no corporate fluff or hype language."
+)
+
 POSTS_DIR = os.path.join(os.path.dirname(__file__), "..", "content", "posts")
 API_URL = "https://api.anthropic.com/v1/messages"
 MODEL = "claude-sonnet-4-6"
 
 
-def get_recent_titles(limit=15):
-    """Pull titles from existing posts so we don't repeat topics."""
+def get_recent_posts(limit=60):
+    """Pull title/date/summary from existing posts so we can avoid repeats
+    and recognize genuine follow-ups vs. duplicate coverage."""
     files = sorted(glob.glob(os.path.join(POSTS_DIR, "*.md")), reverse=True)[:limit]
-    titles = []
+    posts = []
     for f in files:
         with open(f, "r", encoding="utf-8") as fh:
             content = fh.read()
-        match = re.search(r'^title:\s*"?(.*?)"?\s*$', content, re.MULTILINE)
-        if match:
-            titles.append(match.group(1))
-    return titles
+        title_match = re.search(r'^title:\s*"?(.*?)"?\s*$', content, re.MULTILINE)
+        date_match = re.search(r'^date:\s*(\S+)\s*$', content, re.MULTILINE)
+        summary_match = re.search(r'^summary:\s*"?(.*?)"?\s*$', content, re.MULTILINE)
+        if title_match:
+            posts.append({
+                "title": title_match.group(1),
+                "date": date_match.group(1) if date_match else "unknown",
+                "summary": summary_match.group(1) if summary_match else "",
+            })
+    return posts
 
 
-def build_prompt(recent_titles):
-    avoid_clause = ""
-    if recent_titles:
-        joined = "; ".join(recent_titles)
-        avoid_clause = (
-            f"\n\nPosts already published recently (do NOT repeat these topics, "
-            f"pick something different): {joined}"
+def build_prompt(recent_posts):
+    history_clause = "No posts published yet, so any qualifying story is fine."
+    if recent_posts:
+        lines = [
+            f'- "{p["title"]}" (published {p["date"]}): {p["summary"]}'
+            for p in recent_posts
+        ]
+        history_clause = (
+            "Posts already published on this blog (most recent first):\n"
+            + "\n".join(lines)
         )
+
+    today = datetime.date.today()
+    week_ago = today - datetime.timedelta(days=7)
 
     return f"""You write a daily blog post for a blog about: {THEME}
 
-Pick ONE specific, genuinely newsworthy story or development from roughly the
-last few days that fits this theme. Prefer concrete news (a product launch,
-an AI deployment, a partnership or deal, a notable contract) over generic
-commentary. Research it using web search before writing.{avoid_clause}
+{VOICE}
+
+TODAY'S DATE: {today.isoformat()}
+
+FRESHNESS REQUIREMENT — STRICT:
+Pick ONE specific, genuinely newsworthy story that broke or was reported in
+the last 7 days (on or after {week_ago.isoformat()}). Use web search and
+check the actual publish date of your sources before choosing a story. Do
+not use older news just because it's relevant — if you can't find something
+genuinely new from the last 7 days, search again with different terms
+rather than falling back to stale news.
+
+NO-REPEAT RULE:
+{history_clause}
+
+Do NOT cover a topic/company/story already listed above UNLESS there has
+been a genuinely major new development since that post (e.g. a deal that
+was rumored is now signed, a beta has now gone GA, a deployment had a
+significant new outcome). If you do cover a follow-up like this:
+- Say explicitly in the post that this is an update to a story covered
+  before, and briefly note what's new vs. what was already known.
+- Otherwise, pick a different, fresh topic entirely.
+
+Prefer concrete news (a product launch, an AI deployment, a partnership or
+deal, a notable contract) over generic commentary.
 
 Write the post in your own words — do not quote source text directly beyond
 a very short phrase here and there. Aim for 400-600 words. Structure: a short
 intro hook, 2-3 sections with subheadings (use ## markdown), and a short
-closing thought. End with a "## Sources" section listing the names of the
-publications/companies referenced (no need for full URLs).
+closing thought with your own take as an industry insider. End with a
+"## Sources" section listing the names of the publications/companies
+referenced (no need for full URLs).
 
 Respond with ONLY a single JSON object as your final message — no preamble,
 no explanation of your research process, no markdown code fences, nothing
@@ -161,8 +211,8 @@ def write_post(post):
 
 
 def main():
-    recent_titles = get_recent_titles()
-    prompt = build_prompt(recent_titles)
+    recent_posts = get_recent_posts()
+    prompt = build_prompt(recent_posts)
     post = call_claude(prompt)
 
     for field in ("title", "summary", "tags", "body_markdown"):
