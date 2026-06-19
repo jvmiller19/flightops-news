@@ -77,6 +77,74 @@ body {
 .post-body h2 { margin-top: 2rem; }
 .post-body a { color: var(--accent); }
 
+.profile-photo-wrap {
+  text-align: center;
+  margin: 0 0 2rem;
+}
+
+.profile-photo {
+  width: 220px;
+  height: 220px;
+  object-fit: cover;
+  border-radius: 50%;
+  border: 3px solid #fff;
+  box-shadow: 0 2px 12px rgba(0,0,0,0.12);
+}
+
+.contact-form {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  max-width: 480px;
+  margin-top: 1.5rem;
+}
+
+.contact-form label {
+  font-weight: 600;
+  font-size: 0.9rem;
+}
+
+.contact-form input,
+.contact-form textarea {
+  padding: 0.6rem 0.7rem;
+  border: 1px solid #d0d0d0;
+  border-radius: 6px;
+  font-size: 1rem;
+  font-family: inherit;
+}
+
+.contact-form button {
+  background: var(--accent);
+  color: #fff;
+  border: none;
+  border-radius: 6px;
+  padding: 0.7rem 1.2rem;
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  width: fit-content;
+}
+
+.contact-form button:hover {
+  opacity: 0.9;
+}
+
+.site-nav {
+  margin-top: 0.75rem;
+}
+
+.site-nav a {
+  color: var(--text);
+  text-decoration: none;
+  margin-right: 1.25rem;
+  font-weight: 600;
+  font-size: 0.9rem;
+}
+
+.site-nav a:hover {
+  color: var(--accent);
+}
+
 .site-footer {
   max-width: var(--max-width);
   margin: 0 auto;
