@@ -4,7 +4,7 @@ type: "page"
 layout: "single"
 ---
 
-Have a tip, correction, or just want to connect? Send a message below — it goes straight to my inbox, but your details aren't shared anywhere else.
+For any business or media enquires, please contact me using the form below.
 
 <form class="contact-form" action="https://formspree.io/f/xwvjgqdk" method="POST">
   <label for="name">Name</label>
