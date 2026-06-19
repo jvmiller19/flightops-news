@@ -1,0 +1,13 @@
+baseURL = "https://flightops.news/"
+languageCode = "en-us"
+title = "Flight Ops Tech Digest"
+theme = ""
+
+[params]
+  description = "Daily news and trends in aviation flight operations technology — AI, deals, and digital cockpit developments."
+
+[markup.goldmark.renderer]
+  unsafe = true
+
+[permalinks]
+  posts = "/posts/:slug/"
