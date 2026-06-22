@@ -62,8 +62,8 @@ a { color: var(--sky); }
 }
 
 .brand-mark {
-  width: 26px;
-  height: 26px;
+  width: 32px;
+  height: 32px;
   color: var(--sky-soft);
   flex-shrink: 0;
 }
@@ -71,8 +71,8 @@ a { color: var(--sky); }
 .brand-name {
   font-family: var(--font-display);
   font-weight: 700;
-  font-size: 1.5rem;
-  letter-spacing: 0.01em;
+  font-size: 2.1rem;
+  letter-spacing: 0.005em;
 }
 
 .site-tagline {
@@ -327,6 +327,6 @@ a { color: var(--sky); }
 /* ---------- Responsive ---------- */
 @media (max-width: 480px) {
   .post h1 { font-size: 1.6rem; }
-  .brand-name { font-size: 1.3rem; }
+  .brand-name { font-size: 1.6rem; }
   .post-card-title { font-size: 1.1rem; }
 }
