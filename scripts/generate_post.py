@@ -53,6 +53,10 @@ STYLE_RULES = """STYLE RULES — these matter as much as the content:
     saying anything concrete
   - listy parallel structure in prose (e.g. three clauses in a row all
     shaped the same way for rhetorical effect)
+- Write in first-person singular when giving Vincent's own commentary or
+  referencing past posts (e.g. "as I reported last week," "I think," "in my
+  experience") — never first-person plural ("we," "our"). This is a single
+  named author's voice, not an editorial "we."
 - You MAY reference Vincent's real professional background at a general
   level (e.g. "having spent years on the bid-management side of aviation
   tech deals," "from time spent running global delivery teams," "as a
