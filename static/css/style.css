@@ -43,11 +43,7 @@ a { color: var(--sky); }
 
 /* ---------- Header ---------- */
 .site-header {
-  background-color: var(--navy);
-  background-image: url("/images/header-pattern.svg");
-  background-repeat: no-repeat;
-  background-position: top right;
-  background-size: cover;
+  background: var(--navy);
   color: #fff;
 }
 
