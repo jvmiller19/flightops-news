@@ -5,6 +5,7 @@
   <p class="post-meta">{{ .Date.Format "January 2, 2006" }}
     {{ if .Params.tags }} · {{ range .Params.tags }}<span class="tag">{{ . }}</span>{{ end }}{{ end }}
   </p>
+  <p class="post-byline">By Vincent Miller</p>
   {{ end }}
   <div class="post-body">
     {{ .Content }}
