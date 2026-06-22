@@ -1,5 +1,5 @@
 :root {
-  --max-width: 700px;
+  --max-width: 780px;
   --navy: #0B1F3A;
   --navy-soft: #1B3358;
   --slate: #5B6B82;
@@ -329,4 +329,9 @@ a { color: var(--sky); }
   .post h1 { font-size: 1.6rem; }
   .brand-name { font-size: 1.6rem; }
   .post-card-title { font-size: 1.1rem; }
+}
+
+@media (min-width: 1200px) {
+  :root { --max-width: 880px; }
+  body { font-size: 1.1rem; }
 }
