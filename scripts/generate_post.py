@@ -23,19 +23,47 @@ THEME = (
 )
 
 VOICE = (
-    "Write commentary in the voice of a business development and product "
-    "leader with 15+ years in aviation technology — someone who has "
-    "personally negotiated multi-million-dollar B2B aviation tech deals, "
-    "run global delivery and consulting teams, managed competitive bids, "
-    "and built product roadmaps (flight planning, NOTAMs, international "
-    "expansion) at companies like ForeFlight, SITA, NAVBLUE, Lufthansa "
-    "Systems, and FlightAware. This person is also a licensed private "
-    "pilot. The voice should read as an informed industry insider: "
-    "practical and commercially minded rather than purely technical — "
-    "comment on what a deal or product move means competitively, "
-    "operationally, and for customers, not just what was announced. "
-    "Confident, direct, no corporate fluff or hype language."
+    "Write commentary in the voice of Vincent Miller, an aviation business "
+    "development and product leader with 15+ years in aviation technology. "
+    "His real, verified background: Product Manager at Jeppesen ForeFlight; "
+    "Bid Manager at SITA FOR AIRCRAFT; Head of Delivery, Services and "
+    "Deployment at NAVBLUE (now Skywise); Senior Product Consultant for "
+    "Lido Navigation at Lufthansa Systems; Business Development Manager at "
+    "FlightAware. MBA from SDA Bocconi (with coursework at Wharton), BBA "
+    "from George Washington University. Licensed private pilot with an "
+    "instrument rating."
 )
+
+STYLE_RULES = """STYLE RULES — these matter as much as the content:
+- Write in longer, more developed sentences rather than short punchy
+  fragments. Let ideas breathe and build, the way someone with deep
+  domain knowledge naturally explains something.
+- Use contractions naturally (don't, it's, that's, isn't) — this is
+  professional writing, not stiff corporate-speak.
+- Tone is measured and fact-forward, not heavily opinionated. Let the
+  facts and their implications do the work rather than declaring strong
+  verdicts. Light, earned commentary is fine; loud hot-takes are not.
+- AVOID these AI-writing tells entirely:
+  - "in today's rapidly evolving landscape" or any variant of that phrase
+  - "it's worth noting that"
+  - "moreover," "furthermore," or other stiff formal transitions
+  - excessive em dashes (—) used as a crutch for every aside; use them
+    sparingly, like a careful human writer would
+  - overly balanced "on one hand / on the other hand" hedging that avoids
+    saying anything concrete
+  - listy parallel structure in prose (e.g. three clauses in a row all
+    shaped the same way for rhetorical effect)
+- You MAY reference Vincent's real professional background at a general
+  level (e.g. "having spent years on the bid-management side of aviation
+  tech deals," "from time spent running global delivery teams," "as a
+  pilot, this is the kind of tool I'd actually want in the cockpit") since
+  those roles are real and verified above.
+- You must NEVER invent a specific anecdote, named deal, customer, dollar
+  figure, date, or direct quote and attribute it to Vincent's personal
+  experience. Only the general nature of his work (listed above) is fair
+  to reference — never fabricate a specific story that sounds plausible
+  but isn't something he's confirmed actually happened. If in doubt, stay
+  general rather than specific."""
 
 POSTS_DIR = os.path.join(os.path.dirname(__file__), "..", "content", "posts")
 API_URL = "https://api.anthropic.com/v1/messages"
@@ -80,6 +108,8 @@ def build_prompt(recent_posts):
     return f"""You write a daily blog post for a blog about: {THEME}
 
 {VOICE}
+
+{STYLE_RULES}
 
 TODAY'S DATE: {today.isoformat()}
 
