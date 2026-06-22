@@ -4,7 +4,7 @@ type: "page"
 layout: "single"
 ---
 
-For any business or media enquires, please contact me using the form below.
+For any business or media enquiries, please contact me using the form below.
 
 <form class="contact-form" action="https://formspree.io/f/xwvjgqdk" method="POST">
   <label for="name">Name</label>
