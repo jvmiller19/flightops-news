@@ -1,17 +1,20 @@
 {{ define "main" }}
 <article class="post">
+  {{ if eq .Type "posts" }}
+  <p class="post-meta">
+    <span class="post-meta-date">{{ .Date.Format "January 2, 2006" | upper }}</span>
+    {{ if .Params.tags }}{{ range .Params.tags }}<span class="tag">{{ . }}</span>{{ end }}{{ end }}
+  </p>
+  {{ end }}
   <h1>{{ .Title }}</h1>
   {{ if eq .Type "posts" }}
-  <p class="post-meta">{{ .Date.Format "January 2, 2006" }}
-    {{ if .Params.tags }} · {{ range .Params.tags }}<span class="tag">{{ . }}</span>{{ end }}{{ end }}
-  </p>
   <p class="post-byline">By Vincent Miller</p>
   {{ end }}
   <div class="post-body">
     {{ .Content }}
   </div>
   {{ if eq .Type "posts" }}
-  <p><a href="{{ "/posts/" | relURL }}">&larr; Back to all posts</a></p>
+  <p class="post-back"><a href="{{ "/posts/" | relURL }}">&larr; Back to all posts</a></p>
   {{ end }}
 </article>
 {{ end }}

@@ -5,23 +5,37 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>{{ if .IsHome }}{{ .Site.Title }}{{ else }}{{ .Title }} | {{ .Site.Title }}{{ end }}</title>
   <meta name="description" content="{{ if .Description }}{{ .Description }}{{ else }}{{ .Site.Params.description }}{{ end }}">
+  <link rel="icon" type="image/svg+xml" href="{{ "favicon.svg" | relURL }}">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Source+Serif+4:opsz,wght@8..60,400;8..60,600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="{{ "css/style.css" | relURL }}">
   <link rel="alternate" type="application/rss+xml" href="{{ "index.xml" | relURL }}" title="{{ .Site.Title }}">
 </head>
 <body>
   <header class="site-header">
-    <a class="site-title" href="{{ "/" | relURL }}">{{ .Site.Title }}</a>
-    <p class="site-tagline">{{ .Site.Params.description }}</p>
-    <nav class="site-nav">
-      <a href="{{ "/" | relURL }}">Home</a>
-      <a href="{{ "/about/" | relURL }}">About Me</a>
-      <a href="{{ "/contact/" | relURL }}">Contact</a>
-    </nav>
+    <div class="header-inner">
+      <a class="brand" href="{{ "/" | relURL }}">
+        <svg class="brand-mark" viewBox="0 0 32 32" aria-hidden="true">
+          <path d="M4 24 L13 11 L17 17 L28 7" stroke="currentColor" stroke-width="2.4" fill="none" stroke-linecap="round" stroke-linejoin="round" stroke-dasharray="2.6 3.2"/>
+          <circle cx="28" cy="7" r="2.1" fill="var(--amber)"/>
+        </svg>
+        <span class="brand-name">{{ .Site.Title }}</span>
+      </a>
+      <p class="site-tagline">{{ .Site.Params.description }}</p>
+      <div class="flight-path-rule" aria-hidden="true"></div>
+      <nav class="site-nav">
+        <a href="{{ "/" | relURL }}">Home</a>
+        <a href="{{ "/about/" | relURL }}">About Me</a>
+        <a href="{{ "/contact/" | relURL }}">Contact</a>
+      </nav>
+    </div>
   </header>
   <main class="site-main">
     {{ block "main" . }}{{ end }}
   </main>
   <footer class="site-footer">
+    <div class="flight-path-rule" aria-hidden="true"></div>
     <p>&copy; {{ now.Year }} {{ .Site.Title }}</p>
   </footer>
 </body>
