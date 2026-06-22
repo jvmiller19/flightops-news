@@ -1,0 +1,18 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 900 260" preserveAspectRatio="xMaxYMid slice">
+  <!-- Runway perspective, lower right, fading into the navy -->
+  <g opacity="0.35">
+    <polygon points="640,260 760,260 715,150 685,150" fill="#16335C"/>
+    <line x1="700" y1="260" x2="700" y2="150" stroke="#2C4364" stroke-width="2" stroke-dasharray="6 8"/>
+  </g>
+
+  <!-- Flight path arcs, echoing the dashed divider motif -->
+  <g fill="none" stroke="#2C4364" stroke-width="1.6" stroke-linecap="round" opacity="0.55">
+    <path d="M 380 40 Q 600 -20 880 70" stroke-dasharray="3 6"/>
+    <path d="M 420 130 Q 650 80 900 150" stroke-dasharray="3 6"/>
+  </g>
+
+  <!-- Small waypoint dots along the arcs -->
+  <circle cx="610" cy="2" r="2.6" fill="#5FA8E0" opacity="0.5"/>
+  <circle cx="760" cy="20" r="2.6" fill="#5FA8E0" opacity="0.4"/>
+  <circle cx="650" cy="88" r="2.6" fill="#E8A33D" opacity="0.45"/>
+</svg>
