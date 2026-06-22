@@ -1,9 +1,9 @@
 baseURL = "https://flightops.news/"
 languageCode = "en-us"
-title = "Flight Ops Tech Digest"
+title = "FlightOps.News"
 
 [params]
-  description = "Daily news and trends in aviation flight operations technology — AI, deals, and digital cockpit developments."
+  description = "The trusted voice on what's currently innovating Digital Flight Operations"
 
 [markup.goldmark.renderer]
   unsafe = true
