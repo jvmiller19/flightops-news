@@ -65,6 +65,13 @@ body {
   margin-top: 0.25rem;
 }
 
+.post-byline {
+  font-size: 0.85rem;
+  color: var(--muted);
+  margin-top: 0.15rem;
+  margin-bottom: 1rem;
+}
+
 .tag {
   background: #eef2ff;
   color: var(--accent);
