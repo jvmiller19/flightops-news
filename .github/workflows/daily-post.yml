@@ -4,6 +4,11 @@ on:
   schedule:
     # 13:00 UTC, Monday-Friday only (~9am US Eastern). Adjust to taste.
     - cron: "0 13 * * 1-5"
+    # Backup run at 15:30 UTC in case the 13:00 trigger doesn't fire
+    # (GitHub's scheduled cron is best-effort and occasionally skips runs
+    # under load). generate_post.py skips generation if today's post
+    # already exists, so this is safe to run even if the first run succeeded.
+    - cron: "30 15 * * 1-5"
   workflow_dispatch: {}
 
 permissions:

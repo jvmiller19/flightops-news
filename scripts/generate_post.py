@@ -244,7 +244,16 @@ def write_post(post):
     return path
 
 
+def post_already_exists_for_today():
+    today = datetime.date.today().isoformat()
+    return bool(glob.glob(os.path.join(POSTS_DIR, f"{today}-*.md")))
+
+
 def main():
+    if post_already_exists_for_today():
+        print("A post for today already exists — skipping (likely the backup cron run).")
+        return
+
     recent_posts = get_recent_posts()
     prompt = build_prompt(recent_posts)
     post = call_claude(prompt)
