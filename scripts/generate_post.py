@@ -158,14 +158,38 @@ def call_claude(prompt, use_web_search=True):
     except json.JSONDecodeError:
         pass
 
-    # Fallback: the model may have added a sentence of commentary before or
-    # after the JSON object. Pull out the largest {...} block and try that.
-    match = re.search(r"\{.*\}", full_text, re.DOTALL)
-    if match:
-        try:
-            return json.loads(match.group())
-        except json.JSONDecodeError:
-            pass
+    # Fallback: the model may have added commentary before/after the JSON,
+    # or even duplicated the JSON object (e.g. once fenced, once not). Find
+    # the first '{' and walk forward counting brace depth (respecting
+    # quoted strings) to get exactly the first complete JSON object, rather
+    # than a greedy regex that can span across multiple objects.
+    start = full_text.find("{")
+    if start != -1:
+        depth = 0
+        in_string = False
+        escape = False
+        for i in range(start, len(full_text)):
+            ch = full_text[i]
+            if in_string:
+                if escape:
+                    escape = False
+                elif ch == "\\":
+                    escape = True
+                elif ch == '"':
+                    in_string = False
+            else:
+                if ch == '"':
+                    in_string = True
+                elif ch == "{":
+                    depth += 1
+                elif ch == "}":
+                    depth -= 1
+                    if depth == 0:
+                        candidate = full_text[start:i + 1]
+                        try:
+                            return json.loads(candidate)
+                        except json.JSONDecodeError:
+                            break
 
     sys.exit(f"ERROR: Could not parse JSON from model output:\n{full_text}")
 
