@@ -46,6 +46,7 @@ jobs:
         run: |
           git config user.name "blog-bot"
           git config user.email "blog-bot@users.noreply.github.com"
+          mkdir -p .pending content/posts
           git add content/posts/ .pending/
           if git diff --cached --quiet; then
             echo "Nothing to commit."
