@@ -1,10 +1,20 @@
 #!/usr/bin/env python3
 """
-Generates one new blog post markdown file under content/posts/ by calling
-the Anthropic API (with web search enabled) and writing the result as a
-Hugo-compatible markdown file with front matter.
+Two-phase daily post pipeline:
 
-Requires env var: ANTHROPIC_API_KEY
+  research  - picks today's topic, drafts the post, drafts 2-3 pointed
+              questions for Vincent, saves a pending draft under .pending/,
+              and emails him the summary + questions. Does NOT publish.
+
+  finalize  - checked frequently by a separate workflow. For each pending
+              draft: looks for Vincent's email reply (via IMAP on the same
+              Gmail inbox used for sending), and if found, asks Claude to
+              weave his actual answers into the draft as personal
+              commentary, then publishes. Drafts older than 24h with no
+              reply are discarded unpublished.
+
+Requires env vars: ANTHROPIC_API_KEY, MAIL_SERVER, MAIL_PORT, MAIL_USERNAME,
+MAIL_PASSWORD, MAIL_TO. Optional: IMAP_SERVER (defaults to imap.gmail.com).
 """
 
 import os
@@ -12,6 +22,10 @@ import re
 import json
 import glob
 import sys
+import smtplib
+import imaplib
+import email
+import email.message
 import datetime
 import requests
 
@@ -69,10 +83,17 @@ STYLE_RULES = """STYLE RULES — these matter as much as the content:
   but isn't something he's confirmed actually happened. If in doubt, stay
   general rather than specific."""
 
-POSTS_DIR = os.path.join(os.path.dirname(__file__), "..", "content", "posts")
+REPO_ROOT = os.path.join(os.path.dirname(__file__), "..")
+POSTS_DIR = os.path.join(REPO_ROOT, "content", "posts")
+PENDING_DIR = os.path.join(REPO_ROOT, ".pending")
 API_URL = "https://api.anthropic.com/v1/messages"
 MODEL = "claude-sonnet-4-6"
+DRAFT_EXPIRY_HOURS = 24
 
+
+# ---------------------------------------------------------------------------
+# Shared helpers
+# ---------------------------------------------------------------------------
 
 def get_recent_posts(limit=60):
     """Pull title/date/summary from existing posts so we can avoid repeats
@@ -94,74 +115,18 @@ def get_recent_posts(limit=60):
     return posts
 
 
-def build_prompt(recent_posts):
-    history_clause = "No posts published yet, so any qualifying story is fine."
-    if recent_posts:
-        lines = [
-            f'- "{p["title"]}" (published {p["date"]}): {p["summary"]}'
-            for p in recent_posts
-        ]
-        history_clause = (
-            "Posts already published on this blog (most recent first):\n"
-            + "\n".join(lines)
-        )
-
-    today = datetime.date.today()
-    week_ago = today - datetime.timedelta(days=7)
-
-    return f"""You write a daily blog post for a blog about: {THEME}
-
-{VOICE}
-
-{STYLE_RULES}
-
-TODAY'S DATE: {today.isoformat()}
-
-FRESHNESS REQUIREMENT — STRICT:
-Pick ONE specific, genuinely newsworthy story that broke or was reported in
-the last 7 days (on or after {week_ago.isoformat()}). Use web search and
-check the actual publish date of your sources before choosing a story. Do
-not use older news just because it's relevant — if you can't find something
-genuinely new from the last 7 days, search again with different terms
-rather than falling back to stale news.
-
-NO-REPEAT RULE:
-{history_clause}
-
-Do NOT cover a topic/company/story already listed above UNLESS there has
-been a genuinely major new development since that post (e.g. a deal that
-was rumored is now signed, a beta has now gone GA, a deployment had a
-significant new outcome). If you do cover a follow-up like this:
-- Say explicitly in the post that this is an update to a story covered
-  before, and briefly note what's new vs. what was already known.
-- Otherwise, pick a different, fresh topic entirely.
-
-Prefer concrete news (a product launch, an AI deployment, a partnership or
-deal, a notable contract) over generic commentary.
-
-Write the post in your own words — do not quote source text directly beyond
-a very short phrase here and there. Aim for 400-600 words. Structure: a short
-intro hook, 2-3 sections with subheadings (use ## markdown), and a short
-closing thought with your own take as an industry insider. End with a
-"## Sources" section listing the names of the publications/companies
-referenced (no need for full URLs).
-
-Respond with ONLY a single JSON object as your final message — no preamble,
-no explanation of your research process, no markdown code fences, nothing
-before or after the JSON. Your very last message must start with {{ and end
-with }}, in exactly this shape:
-{{
-  "title": "string, specific and concrete, no clickbait",
-  "summary": "one sentence, plain text, for the post list preview",
-  "tags": ["2 to 4 short lowercase tags"],
-  "body_markdown": "the full post body in markdown, NOT including the title as a heading"
-}}"""
-
-
-def call_claude(prompt):
+def call_claude(prompt, use_web_search=True):
     api_key = os.environ.get("ANTHROPIC_API_KEY")
     if not api_key:
         sys.exit("ERROR: ANTHROPIC_API_KEY environment variable is not set.")
+
+    body = {
+        "model": MODEL,
+        "max_tokens": 4000,
+        "messages": [{"role": "user", "content": prompt}],
+    }
+    if use_web_search:
+        body["tools"] = [{"type": "web_search_20250305", "name": "web_search"}]
 
     response = requests.post(
         API_URL,
@@ -170,12 +135,7 @@ def call_claude(prompt):
             "x-api-key": api_key,
             "anthropic-version": "2023-06-01",
         },
-        json={
-            "model": MODEL,
-            "max_tokens": 4000,
-            "messages": [{"role": "user", "content": prompt}],
-            "tools": [{"type": "web_search_20250305", "name": "web_search"}],
-        },
+        json=body,
         timeout=120,
     )
     response.raise_for_status()
@@ -217,10 +177,9 @@ def slugify(title):
     return slug[:80]
 
 
-def write_post(post):
-    today = datetime.date.today().isoformat()
+def write_post(post, date_str):
     slug = slugify(post["title"])
-    filename = f"{today}-{slug}.md"
+    filename = f"{date_str}-{slug}.md"
     path = os.path.join(POSTS_DIR, filename)
 
     tags_yaml = "[" + ", ".join(f'"{t}"' for t in post.get("tags", [])) + "]"
@@ -229,7 +188,7 @@ def write_post(post):
     front_matter = (
         "---\n"
         f'title: "{post["title"]}"\n'
-        f"date: {today}\n"
+        f"date: {date_str}\n"
         f"tags: {tags_yaml}\n"
         f'summary: "{summary}"\n'
         "draft: false\n"
@@ -244,32 +203,382 @@ def write_post(post):
     return path
 
 
-def post_already_exists_for_today():
-    today = datetime.date.today().isoformat()
-    return bool(glob.glob(os.path.join(POSTS_DIR, f"{today}-*.md")))
+def post_exists_for_date(date_str):
+    return bool(glob.glob(os.path.join(POSTS_DIR, f"{date_str}-*.md")))
 
 
-def main():
-    if post_already_exists_for_today():
-        print("A post for today already exists — skipping (likely the backup cron run).")
+def send_email(subject, body):
+    server = os.environ.get("MAIL_SERVER")
+    port = int(os.environ.get("MAIL_PORT", "587"))
+    username = os.environ.get("MAIL_USERNAME")
+    password = os.environ.get("MAIL_PASSWORD")
+    mail_to = os.environ.get("MAIL_TO")
+
+    if not all([server, username, password, mail_to]):
+        print("WARNING: mail env vars not fully set, skipping email send.")
+        return
+
+    msg = email.message.EmailMessage()
+    msg["From"] = username
+    msg["To"] = mail_to
+    msg["Subject"] = subject
+    msg.set_content(body)
+
+    with smtplib.SMTP(server, port) as smtp:
+        smtp.starttls()
+        smtp.login(username, password)
+        smtp.send_message(msg)
+    print(f"Sent email: {subject}")
+
+
+def write_gh_output(values):
+    gh_output = os.environ.get("GITHUB_OUTPUT")
+    if not gh_output:
+        return
+    with open(gh_output, "a", encoding="utf-8") as fh:
+        for key, val in values.items():
+            fh.write(f"{key}={val}\n")
+
+
+# ---------------------------------------------------------------------------
+# Pending draft storage
+# ---------------------------------------------------------------------------
+
+def pending_path(date_str):
+    return os.path.join(PENDING_DIR, f"{date_str}.json")
+
+
+def save_pending(draft):
+    os.makedirs(PENDING_DIR, exist_ok=True)
+    path = pending_path(draft["date"])
+    with open(path, "w", encoding="utf-8") as fh:
+        json.dump(draft, fh, indent=2)
+    print(f"Saved pending draft: {path}")
+
+
+def load_all_pending():
+    drafts = []
+    for path in sorted(glob.glob(os.path.join(PENDING_DIR, "*.json"))):
+        with open(path, "r", encoding="utf-8") as fh:
+            drafts.append((path, json.load(fh)))
+    return drafts
+
+
+def ref_token(date_str):
+    return f"[ref:{date_str}]"
+
+
+# ---------------------------------------------------------------------------
+# Phase 1: research
+# ---------------------------------------------------------------------------
+
+def build_research_prompt(recent_posts, today):
+    history_clause = "No posts published yet, so any qualifying story is fine."
+    if recent_posts:
+        lines = [
+            f'- "{p["title"]}" (published {p["date"]}): {p["summary"]}'
+            for p in recent_posts
+        ]
+        history_clause = (
+            "Posts already published on this blog (most recent first):\n"
+            + "\n".join(lines)
+        )
+
+    week_ago = today - datetime.timedelta(days=7)
+
+    return f"""You write a daily blog post for a blog about: {THEME}
+
+{VOICE}
+
+{STYLE_RULES}
+
+TODAY'S DATE: {today.isoformat()}
+
+FRESHNESS REQUIREMENT — STRICT:
+Pick ONE specific, genuinely newsworthy story that broke or was reported in
+the last 7 days (on or after {week_ago.isoformat()}). Use web search and
+check the actual publish date of your sources before choosing a story. Do
+not use older news just because it's relevant — if you can't find something
+genuinely new from the last 7 days, search again with different terms
+rather than falling back to stale news.
+
+NO-REPEAT RULE:
+{history_clause}
+
+Do NOT cover a topic/company/story already listed above UNLESS there has
+been a genuinely major new development since that post (e.g. a deal that
+was rumored is now signed, a beta has now gone GA, a deployment had a
+significant new outcome). If you do cover a follow-up like this:
+- Say explicitly in the post that this is an update to a story covered
+  before, and briefly note what's new vs. what was already known.
+- Otherwise, pick a different, fresh topic entirely.
+
+Prefer concrete news (a product launch, an AI deployment, a partnership or
+deal, a notable contract) over generic commentary.
+
+Write a DRAFT of the post in your own words — do not quote source text
+directly beyond a very short phrase here and there. Aim for 400-600 words.
+Structure: a short intro hook, 2-3 sections with subheadings (use ##
+markdown), and a short closing thought. Leave the closing thought light —
+it will be revised afterward to incorporate Vincent's own personal take, so
+don't make this draft's ending feel too final or conclusive. End with a
+"## Sources" section listing the names of the publications/companies
+referenced (no need for full URLs).
+
+Also write 2 or 3 SHORT, POINTED questions to ask Vincent about this
+specific story — designed so his quick answers (multiple choice or a short
+free-text answer, a sentence or two at most) can be woven into the post as
+his personal commentary. Good questions probe his actual opinion or
+experience-informed read on the news (e.g. "Does this deal surprise you, or does it look inevitable given the trend? (Surprising / Inevitable / Mixed)",
+"Is this the kind of capability your old delivery teams would have wanted
+sooner — yes/no and why in a sentence?"). Avoid generic or vague questions.
+
+Respond with ONLY a single JSON object as your final message — no preamble,
+no explanation of your research process, no markdown code fences, nothing
+before or after the JSON. Your very last message must start with {{ and end
+with }}, in exactly this shape:
+{{
+  "title": "string, specific and concrete, no clickbait",
+  "summary": "one sentence, plain text, for the post list preview",
+  "tags": ["2 to 4 short lowercase tags"],
+  "body_markdown": "the full draft post body in markdown, NOT including the title as a heading",
+  "questions": ["question 1", "question 2", "optional question 3"]
+}}"""
+
+
+def run_research():
+    today = datetime.date.today()
+    today_str = today.isoformat()
+
+    if post_exists_for_date(today_str):
+        print("A post for today already exists — skipping research.")
+        return
+    if os.path.exists(pending_path(today_str)):
+        print("A pending draft for today already exists — skipping research.")
         return
 
     recent_posts = get_recent_posts()
-    prompt = build_prompt(recent_posts)
-    post = call_claude(prompt)
+    prompt = build_research_prompt(recent_posts, today)
+    draft = call_claude(prompt, use_web_search=True)
 
-    for field in ("title", "summary", "tags", "body_markdown"):
-        if field not in post:
+    for field in ("title", "summary", "tags", "body_markdown", "questions"):
+        if field not in draft:
             sys.exit(f"ERROR: model response missing required field '{field}'")
 
-    write_post(post)
+    draft["date"] = today_str
+    draft["created_at"] = datetime.datetime.now(datetime.timezone.utc).isoformat()
+    save_pending(draft)
 
-    # Expose title/summary to later GitHub Actions steps (e.g. email step).
-    gh_output = os.environ.get("GITHUB_OUTPUT")
-    if gh_output:
-        with open(gh_output, "a", encoding="utf-8") as fh:
-            fh.write(f"post_title={post['title']}\n")
-            fh.write(f"post_summary={post.get('summary', '')}\n")
+    questions_text = "\n".join(f"{i+1}. {q}" for i, q in enumerate(draft["questions"]))
+    body = f"""Today's draft topic: {draft['title']}
+
+{draft['summary']}
+
+I'd like your take before this publishes. Just reply to this email with
+your answers (any format is fine, e.g. "1) B  2) yes, because...") and
+I'll weave them into the post:
+
+{questions_text}
+
+If I don't hear back within {DRAFT_EXPIRY_HOURS} hours, I'll skip
+publishing today's post rather than guess at your take.
+
+— Auto-generated by flightops.news pipeline {ref_token(today_str)}"""
+
+    send_email(f"Your input needed on today's post — {today_str} {ref_token(today_str)}", body)
+
+
+# ---------------------------------------------------------------------------
+# Phase 2: finalize
+# ---------------------------------------------------------------------------
+
+def extract_reply_text(raw_body):
+    """Strip quoted original message from a plain-text email reply, keeping
+    only what the person actually typed above the quote line."""
+    cut_patterns = [
+        r"\nOn .{0,100} wrote:\s*\n",
+        r"\n-{2,}\s*Original Message\s*-{2,}",
+        r"\n>.*",
+    ]
+    text = raw_body
+    for pattern in cut_patterns:
+        match = re.search(pattern, text, re.DOTALL)
+        if match:
+            text = text[:match.start()]
+    return text.strip()
+
+
+def find_reply(date_str):
+    """Search the inbox via IMAP for a reply referencing this draft's ref
+    token. Returns the extracted reply text, or None if not found."""
+    imap_server = os.environ.get("IMAP_SERVER", "imap.gmail.com")
+    username = os.environ.get("MAIL_USERNAME")
+    password = os.environ.get("MAIL_PASSWORD")
+    if not username or not password:
+        print("WARNING: mail credentials not set, cannot check for reply.")
+        return None
+
+    token = ref_token(date_str)
+    try:
+        conn = imaplib.IMAP4_SSL(imap_server)
+        conn.login(username, password)
+        conn.select("INBOX")
+        status, data = conn.search(None, f'(SUBJECT "{token}")')
+        if status != "OK" or not data[0]:
+            conn.logout()
+            return None
+
+        ids = data[0].split()
+        # Most recent matching message first.
+        for msg_id in reversed(ids):
+            status, msg_data = conn.fetch(msg_id, "(RFC822)")
+            if status != "OK":
+                continue
+            msg = email.message_from_bytes(msg_data[0][1])
+            subject = msg.get("Subject", "")
+            # Only treat actual replies (not the original sent email) as input.
+            if not subject.lower().startswith("re:"):
+                continue
+
+            raw_body = None
+            if msg.is_multipart():
+                for part in msg.walk():
+                    if part.get_content_type() == "text/plain":
+                        raw_body = part.get_payload(decode=True).decode(
+                            part.get_content_charset() or "utf-8", errors="replace"
+                        )
+                        break
+            else:
+                raw_body = msg.get_payload(decode=True).decode(
+                    msg.get_content_charset() or "utf-8", errors="replace"
+                )
+
+            if raw_body:
+                reply_text = extract_reply_text(raw_body)
+                if reply_text:
+                    conn.logout()
+                    return reply_text
+        conn.logout()
+        return None
+    except Exception as exc:
+        print(f"WARNING: IMAP check failed: {exc}")
+        return None
+
+
+def build_finalize_prompt(draft, reply_text):
+    questions_text = "\n".join(f"- {q}" for q in draft["questions"])
+    return f"""You are revising a draft blog post to weave in the author's
+own personal commentary, which he just gave in response to specific
+questions. Do not change the factual reporting or restructure the piece —
+only revise it (especially the closing section) so his actual answers below
+read as his natural first-person commentary, per the voice and style rules
+below.
+
+{VOICE}
+
+{STYLE_RULES}
+
+DRAFT TITLE: {draft['title']}
+
+DRAFT BODY:
+{draft['body_markdown']}
+
+QUESTIONS HE WAS ASKED:
+{questions_text}
+
+HIS RAW REPLY (verbatim, may be informal or use shorthand like "1) B"):
+\"\"\"{reply_text}\"\"\"
+
+Incorporate his actual answers naturally into the post as his own voice —
+do not quote his reply verbatim or refer to "questions" or "answers"
+explicitly; it should read as commentary he simply included while writing.
+Do not fabricate anything beyond what his reply conveys.
+
+Respond with ONLY a single JSON object as your final message — no preamble,
+no markdown code fences, nothing before or after the JSON. Your very last
+message must start with {{ and end with }}, in exactly this shape:
+{{
+  "title": "string, may be unchanged from the draft",
+  "summary": "one sentence, plain text, for the post list preview",
+  "tags": ["2 to 4 short lowercase tags"],
+  "body_markdown": "the full REVISED post body in markdown, NOT including the title as a heading"
+}}"""
+
+
+def run_finalize():
+    pending = load_all_pending()
+    if not pending:
+        print("No pending drafts.")
+        return
+
+    now = datetime.datetime.now(datetime.timezone.utc)
+    published_any = False
+
+    for path, draft in pending:
+        date_str = draft["date"]
+
+        if post_exists_for_date(date_str):
+            print(f"Post for {date_str} already exists — removing stale pending draft.")
+            os.remove(path)
+            continue
+
+        created_at = datetime.datetime.fromisoformat(draft["created_at"])
+        age_hours = (now - created_at).total_seconds() / 3600
+        if age_hours > DRAFT_EXPIRY_HOURS:
+            print(f"Pending draft for {date_str} expired ({age_hours:.1f}h old) — discarding.")
+            os.remove(path)
+            send_email(
+                f"Skipped today's post — no reply received ({date_str})",
+                f"I didn't hear back on the {date_str} draft within "
+                f"{DRAFT_EXPIRY_HOURS} hours, so I skipped publishing rather "
+                f"than guess at your take. Topic was: {draft['title']}",
+            )
+            continue
+
+        reply_text = find_reply(date_str)
+        if not reply_text:
+            print(f"No reply yet for {date_str} pending draft.")
+            continue
+
+        print(f"Found reply for {date_str}, finalizing post.")
+        prompt = build_finalize_prompt(draft, reply_text)
+        final_post = call_claude(prompt, use_web_search=False)
+
+        for field in ("title", "summary", "tags", "body_markdown"):
+            if field not in final_post:
+                sys.exit(f"ERROR: finalize response missing required field '{field}'")
+
+        write_post(final_post, date_str)
+        os.remove(path)
+        published_any = True
+
+        send_email(
+            f"Published: {final_post['title']}",
+            f"Today's post is live, with your input included.\n\n"
+            f"Title: {final_post['title']}\n"
+            f"Summary: {final_post.get('summary', '')}\n\n"
+            f"It will be live on the site within a few minutes, once the "
+            f"deploy workflow finishes.",
+        )
+
+        write_gh_output({
+            "published": "true",
+            "post_title": final_post["title"],
+            "post_summary": final_post.get("summary", ""),
+        })
+
+    if not published_any:
+        write_gh_output({"published": "false"})
+
+
+def main():
+    if len(sys.argv) != 2 or sys.argv[1] not in ("research", "finalize"):
+        sys.exit("Usage: generate_post.py [research|finalize]")
+
+    if sys.argv[1] == "research":
+        run_research()
+    else:
+        run_finalize()
 
 
 if __name__ == "__main__":

@@ -1,4 +1,4 @@
-name: Generate Daily Post
+name: Generate Daily Post (Research Phase)
 
 on:
   schedule:
@@ -8,8 +8,8 @@ on:
     - cron: "7 13 * * 1-5"
     # Backup run at 15:37 UTC in case the 13:07 trigger doesn't fire
     # (GitHub's scheduled cron is best-effort and occasionally skips runs
-    # under load). generate_post.py skips generation if today's post
-    # already exists, so this is safe to run even if the first run succeeded.
+    # under load). generate_post.py skips if a draft/post for today already
+    # exists, so this is safe to run even if the first run succeeded.
     - cron: "37 15 * * 1-5"
   workflow_dispatch: {}
   # External backstop: an outside cron service (cron-job.org) calls GitHub's
@@ -20,10 +20,9 @@ on:
 
 permissions:
   contents: write
-  actions: write
 
 jobs:
-  generate:
+  research:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
@@ -37,48 +36,24 @@ jobs:
       - name: Install dependencies
         run: pip install -r scripts/requirements.txt
 
-      - name: Generate post
-        id: generate
+      - name: Research topic, draft post, email Vincent the questions
         env:
           ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
-        run: python scripts/generate_post.py
+          MAIL_SERVER: ${{ secrets.MAIL_SERVER }}
+          MAIL_PORT: ${{ secrets.MAIL_PORT }}
+          MAIL_USERNAME: ${{ secrets.MAIL_USERNAME }}
+          MAIL_PASSWORD: ${{ secrets.MAIL_PASSWORD }}
+          MAIL_TO: ${{ secrets.MAIL_TO }}
+        run: python scripts/generate_post.py research
 
-      - name: Commit and push new post
-        id: commit
+      - name: Commit pending draft
         run: |
           git config user.name "blog-bot"
           git config user.email "blog-bot@users.noreply.github.com"
-          git add content/posts/
+          git add .pending/
           if git diff --cached --quiet; then
-            echo "No new post to commit."
-            echo "new_post=false" >> "$GITHUB_OUTPUT"
+            echo "No new pending draft to commit."
           else
-            git commit -m "Auto: daily post $(date -u +%Y-%m-%d)"
+            git commit -m "Auto: pending draft $(date -u +%Y-%m-%d)"
             git push
-            echo "new_post=true" >> "$GITHUB_OUTPUT"
           fi
-
-      - name: Trigger site deploy
-        if: steps.commit.outputs.new_post == 'true'
-        env:
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        run: gh workflow run deploy.yml
-
-      - name: Email notification
-        if: steps.commit.outputs.new_post == 'true'
-        uses: dawidd6/action-send-mail@v3
-        with:
-          server_address: ${{ secrets.MAIL_SERVER }}
-          server_port: ${{ secrets.MAIL_PORT }}
-          username: ${{ secrets.MAIL_USERNAME }}
-          password: ${{ secrets.MAIL_PASSWORD }}
-          from: Flight Ops Tech Digest <${{ secrets.MAIL_USERNAME }}>
-          to: ${{ secrets.MAIL_TO }}
-          subject: "New post published: ${{ steps.generate.outputs.post_title }}"
-          body: |
-            A new post just went live on Flight Ops Tech Digest.
-
-            Title: ${{ steps.generate.outputs.post_title }}
-            Summary: ${{ steps.generate.outputs.post_summary }}
-
-            It will be live on the site within a few minutes, once the deploy workflow finishes.
