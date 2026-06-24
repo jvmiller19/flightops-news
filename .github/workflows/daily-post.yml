@@ -12,6 +12,11 @@ on:
     # already exists, so this is safe to run even if the first run succeeded.
     - cron: "37 15 * * 1-5"
   workflow_dispatch: {}
+  # External backstop: an outside cron service (cron-job.org) calls GitHub's
+  # repository_dispatch API daily, bypassing GitHub's own scheduler entirely
+  # in case both cron triggers above fail to fire.
+  repository_dispatch:
+    types: [daily-post-trigger]
 
 permissions:
   contents: write
