@@ -26,6 +26,7 @@ import smtplib
 import imaplib
 import email
 import email.message
+import email.header
 import datetime
 import requests
 
@@ -484,9 +485,16 @@ def find_reply(date_str):
             if status != "OK":
                 continue
             msg = email.message_from_bytes(msg_data[0][1])
-            subject = msg.get("Subject", "")
+            raw_subject = msg.get("Subject", "")
+            decoded_parts = email.header.decode_header(raw_subject)
+            subject = "".join(
+                part.decode(enc or "utf-8", errors="replace") if isinstance(part, bytes) else part
+                for part, enc in decoded_parts
+            )
+            print(f"Inspecting candidate message, subject: {subject!r}")
             # Only treat actual replies (not the original sent email) as input.
             if not subject.lower().startswith("re:"):
+                print("  -> skipped, does not start with 'Re:'")
                 continue
 
             raw_body = None
@@ -502,11 +510,15 @@ def find_reply(date_str):
                     msg.get_content_charset() or "utf-8", errors="replace"
                 )
 
-            if raw_body:
-                reply_text = extract_reply_text(raw_body)
-                if reply_text:
-                    conn.logout()
-                    return reply_text
+            if not raw_body:
+                print("  -> skipped, no text/plain body found")
+                continue
+            reply_text = extract_reply_text(raw_body)
+            if reply_text:
+                print(f"  -> using as reply ({len(reply_text)} chars)")
+                conn.logout()
+                return reply_text
+            print("  -> skipped, extracted reply text was empty after stripping quote")
         conn.logout()
         return None
     except Exception as exc:
