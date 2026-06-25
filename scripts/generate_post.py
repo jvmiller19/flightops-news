@@ -464,6 +464,16 @@ def find_reply(date_str):
         conn.select("INBOX")
         status, data = conn.search(None, f'(SUBJECT "{token}")')
         if status != "OK" or not data[0]:
+            # Diagnostic: log recent subjects so we can see why the match
+            # failed (e.g. subject encoding) without needing mailbox access.
+            _, recent_ids = conn.search(None, "ALL")
+            recent_ids = recent_ids[0].split()[-10:] if recent_ids and recent_ids[0] else []
+            print(f"No SUBJECT match for token {token!r}. Last {len(recent_ids)} inbox subjects:")
+            for msg_id in recent_ids:
+                _, hdr_data = conn.fetch(msg_id, "(BODY[HEADER.FIELDS (SUBJECT)])")
+                if hdr_data and hdr_data[0]:
+                    raw_header = hdr_data[0][1].decode("utf-8", errors="replace").strip()
+                    print(f"  {raw_header!r}")
             conn.logout()
             return None
 
