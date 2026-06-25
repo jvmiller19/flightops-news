@@ -248,10 +248,15 @@ def send_email(subject, body):
     msg["Subject"] = subject
     msg.set_content(body)
 
-    with smtplib.SMTP(server, port) as smtp:
-        smtp.starttls()
-        smtp.login(username, password)
-        smtp.send_message(msg)
+    if port == 465:
+        with smtplib.SMTP_SSL(server, port) as smtp:
+            smtp.login(username, password)
+            smtp.send_message(msg)
+    else:
+        with smtplib.SMTP(server, port) as smtp:
+            smtp.starttls()
+            smtp.login(username, password)
+            smtp.send_message(msg)
     print(f"Sent email: {subject}")
 
 
