@@ -6,6 +6,12 @@ on:
     # exits quickly if .pending/ is empty), so a tight interval is fine.
     - cron: "*/30 * * * *"
   workflow_dispatch: {}
+  # External backstop: GitHub's own schedule trigger has repeatedly failed
+  # to fire at all (not just late) for the daily-post workflow, so this one
+  # gets the same outside cron-job.org backstop, hitting repository_dispatch
+  # independent of GitHub's scheduler.
+  repository_dispatch:
+    types: [check-feedback-trigger]
 
 permissions:
   contents: write
