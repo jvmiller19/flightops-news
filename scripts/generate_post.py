@@ -30,10 +30,20 @@ import datetime
 import requests
 
 THEME = (
-    "News and trends in aviation flight operations technology — including "
-    "new product developments, uses of AI in flight planning / digital "
-    "cockpit / dispatch / airline operations, and notable deals or "
-    "partnerships signed in the industry."
+    "News and trends in aviation FLIGHT OPERATIONS technology specifically. "
+    "IN SCOPE: AI adoption in flight operations, flight planning "
+    "optimization, dispatch/OCC (operations control center) transformation, "
+    "next-generation aviation software, airline data platforms, "
+    "sustainability technology relevant to flight operations, autonomy and "
+    "advanced air mobility, and how airlines evaluate or adopt emerging "
+    "technology in these areas. Also fair game: notable deals, "
+    "partnerships, or product launches in any of the above. "
+    "OUT OF SCOPE — do not write about these even if aviation-tech-adjacent: "
+    "MRO (maintenance, repair, and overhaul) and aircraft maintenance "
+    "technology; customer-facing/passenger technology such as inflight "
+    "wifi, entertainment systems, or cabin experience. If your research "
+    "surfaces a story in one of the out-of-scope areas, discard it and "
+    "search again for something in scope rather than writing about it."
 )
 
 VOICE = (
