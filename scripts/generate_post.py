@@ -100,6 +100,67 @@ STYLE_RULES = """STYLE RULES — these matter as much as the content:
   but isn't something he's confirmed actually happened. If in doubt, stay
   general rather than specific."""
 
+# Weekly content structure (Monday=0 ... Friday=4). Each day has a
+# distinct angle on the same in-scope theme, not a different topic area.
+DAY_THEMES = {
+    0: {
+        "name": "Industry Signal",
+        "guidance": (
+            "Pick a major piece of flight-ops-relevant aviation news and "
+            "focus on WHY IT MATTERS beneath the surface — the real "
+            "underlying shift the announcement represents, not just what "
+            "was announced. Example framing: \"Airline X's new AI "
+            "initiative is less about AI and more about workflow "
+            "redesign.\" Look past the press-release framing to the "
+            "operational or strategic substance."
+        ),
+    },
+    1: {
+        "name": "Flight Operations Deep Dive",
+        "guidance": (
+            "Go deep on a specific flight operations discipline: dispatch, "
+            "OCC (operations control center), flight planning, NOTAMs, "
+            "weather, or optimization. Favor a story that lets you explain "
+            "how something actually works operationally, not just that it "
+            "happened."
+        ),
+    },
+    2: {
+        "name": "Technology / Innovation",
+        "guidance": (
+            "Focus on the technology itself — AI, automation, data "
+            "platforms, startups, or emerging aviation tech relevant to "
+            "flight operations. Center the post on what's technically new "
+            "or interesting about the approach, not just the business deal "
+            "around it."
+        ),
+    },
+    3: {
+        "name": "Commercial / Business Angle",
+        "guidance": (
+            "Take a strategic-thinker's view rather than an operator's "
+            "view: what does this news mean for airlines, vendors, or "
+            "investors? Focus on competitive dynamics, market "
+            "implications, or what smart adoption/investment looks like in "
+            "response to this news."
+        ),
+    },
+    4: {
+        "name": "Your Perspective",
+        "guidance": (
+            "Write a stronger opinion piece than usual. Take a clear, "
+            "specific point of view on a flight-ops-tech topic or trend, "
+            "argued with conviction — not hedged both-sides commentary. "
+            "Example framing: \"The aviation industry does not have a "
+            "technology problem. It has an adoption problem.\" This is the "
+            "one day of the week where the post can be built around "
+            "Vincent's take itself rather than around a single news item, "
+            "though it should still be grounded in something real and "
+            "recent."
+        ),
+    },
+}
+
 REPO_ROOT = os.path.join(os.path.dirname(__file__), "..")
 POSTS_DIR = os.path.join(REPO_ROOT, "content", "posts")
 PENDING_DIR = os.path.join(REPO_ROOT, ".pending")
@@ -331,6 +392,17 @@ def build_research_prompt(recent_posts, today):
         )
 
     week_ago = today - datetime.timedelta(days=7)
+    day_theme = DAY_THEMES.get(today.weekday())
+
+    day_theme_clause = ""
+    if day_theme:
+        day_theme_clause = f"""
+TODAY'S WEEKLY SLOT — {day_theme['name']}:
+{day_theme['guidance']}
+This is the angle/lens for today's post, within the overall blog scope
+below — not a different topic area. Still pick a real, fresh, in-scope
+story; just frame and structure it through today's lens.
+"""
 
     return f"""You write a daily blog post for a blog about: {THEME}
 
@@ -339,7 +411,7 @@ def build_research_prompt(recent_posts, today):
 {STYLE_RULES}
 
 TODAY'S DATE: {today.isoformat()}
-
+{day_theme_clause}
 FRESHNESS REQUIREMENT — STRICT:
 Pick ONE specific, genuinely newsworthy story that broke or was reported in
 the last 7 days (on or after {week_ago.isoformat()}). Use web search and
