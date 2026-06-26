@@ -386,10 +386,66 @@ with }}, in exactly this shape:
 }}"""
 
 
+def _nth_weekday(year, month, weekday, n):
+    """1st, 2nd, 3rd... occurrence of `weekday` (Mon=0) in a given month."""
+    d = datetime.date(year, month, 1)
+    offset = (weekday - d.weekday()) % 7
+    d += datetime.timedelta(days=offset + 7 * (n - 1))
+    return d
+
+
+def _last_weekday(year, month, weekday):
+    """Last occurrence of `weekday` (Mon=0) in a given month."""
+    if month == 12:
+        d = datetime.date(year + 1, 1, 1) - datetime.timedelta(days=1)
+    else:
+        d = datetime.date(year, month + 1, 1) - datetime.timedelta(days=1)
+    offset = (d.weekday() - weekday) % 7
+    return d - datetime.timedelta(days=offset)
+
+
+def _observed(date_obj):
+    """Federal holidays falling on a weekend are observed on the nearest
+    weekday (Saturday -> Friday, Sunday -> Monday)."""
+    if date_obj.weekday() == 5:
+        return date_obj - datetime.timedelta(days=1)
+    if date_obj.weekday() == 6:
+        return date_obj + datetime.timedelta(days=1)
+    return date_obj
+
+
+def us_federal_holidays(year):
+    """Set of date objects for US federal holidays (observed dates) in a
+    given year."""
+    fixed = [
+        datetime.date(year, 1, 1),    # New Year's Day
+        datetime.date(year, 6, 19),   # Juneteenth
+        datetime.date(year, 7, 4),    # Independence Day
+        datetime.date(year, 11, 11),  # Veterans Day
+        datetime.date(year, 12, 25),  # Christmas Day
+    ]
+    floating = [
+        _nth_weekday(year, 1, 0, 3),   # MLK Day - 3rd Monday Jan
+        _nth_weekday(year, 2, 0, 3),   # Washington's Birthday - 3rd Monday Feb
+        _last_weekday(year, 5, 0),     # Memorial Day - last Monday May
+        _nth_weekday(year, 9, 0, 1),   # Labor Day - 1st Monday Sep
+        _nth_weekday(year, 10, 0, 2),  # Columbus Day - 2nd Monday Oct
+        _nth_weekday(year, 11, 3, 4),  # Thanksgiving - 4th Thursday Nov
+    ]
+    return {_observed(d) for d in fixed} | set(floating)
+
+
+def is_us_federal_holiday(date_obj):
+    return date_obj in us_federal_holidays(date_obj.year)
+
+
 def run_research():
     today = datetime.date.today()
     today_str = today.isoformat()
 
+    if is_us_federal_holiday(today):
+        print(f"{today_str} is a US federal holiday — skipping research.")
+        return
     if post_exists_for_date(today_str):
         print("A post for today already exists — skipping research.")
         return

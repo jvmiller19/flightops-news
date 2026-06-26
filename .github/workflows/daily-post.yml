@@ -2,15 +2,15 @@ name: Generate Daily Post (Research Phase)
 
 on:
   schedule:
-    # 13:07 UTC, Monday-Friday only (~9am US Eastern). Offset from the top
+    # 7:07 UTC, Monday-Friday only (~3am US Eastern). Offset from the top
     # of the hour since GitHub recommends avoiding :00 to reduce queuing
     # delay from the load spike when many repos' crons fire simultaneously.
-    - cron: "7 13 * * 1-5"
-    # Backup run at 15:37 UTC in case the 13:07 trigger doesn't fire
+    - cron: "7 7 * * 1-5"
+    # Backup run at 9:07 UTC in case the 7:07 trigger doesn't fire
     # (GitHub's scheduled cron is best-effort and occasionally skips runs
     # under load). generate_post.py skips if a draft/post for today already
     # exists, so this is safe to run even if the first run succeeded.
-    - cron: "37 15 * * 1-5"
+    - cron: "7 9 * * 1-5"
   workflow_dispatch: {}
   # External backstop: an outside cron service (cron-job.org) calls GitHub's
   # repository_dispatch API daily, bypassing GitHub's own scheduler entirely
