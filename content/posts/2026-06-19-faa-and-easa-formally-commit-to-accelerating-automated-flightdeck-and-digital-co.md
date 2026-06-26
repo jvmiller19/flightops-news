@@ -32,7 +32,7 @@ I've sat across the table from airline technology procurement teams when they as
 
 This joint statement doesn't solve that overnight. Words on paper from regulators are not the same as approved technical standard orders or harmonized ETSO/TSO guidance. But directionally, this is exactly what the digital cockpit and AI-in-flight-ops sector needed: a clear, public, bilateral signal that the two major regulators are rowing together rather than diverging. For product teams building roadmaps right now — whether you're at a startup or at one of the big platforms — this is the moment to make sure your next product planning cycle explicitly maps to these regulatory priorities. The vendors who shape their feature roadmaps to the framework being built here will have a meaningful certification and sales advantage in 2027 and beyond.
 
-As a pilot, I'll add one more thing: the commitment to modernize simulator training for automated environments is long overdue. The gap between how automated today's aircraft are and how we train pilots to handle that automation is real. Regulators acknowledging it formally — and committing to fix it — is worth noting.
+I'll add one more thing: the commitment to modernize simulator training for automated environments is long overdue. The gap between how automated today's aircraft are and how we train pilots to handle that automation is real. Regulators acknowledging it formally — and committing to fix it — is worth noting.
 
 ## Sources
 - EASA Newsroom (easa.europa.eu)
