@@ -463,6 +463,11 @@ experience-informed read on the news (e.g. "Does this deal surprise you, or does
 "Is this the kind of capability your old delivery teams would have wanted
 sooner — yes/no and why in a sentence?"). Avoid generic or vague questions.{question_count_note}
 
+Also write a one-line "linkedin_teaser" — a punchy, scroll-stopping single
+sentence Vincent could post on LinkedIn to draw attention to this article
+(not just a restatement of the title; give it a hook). No hashtags, no
+emoji.
+
 Respond with ONLY a single JSON object as your final message — no preamble,
 no explanation of your research process, no markdown code fences, nothing
 before or after the JSON. Your very last message must start with {{ and end
@@ -472,7 +477,8 @@ with }}, in exactly this shape:
   "summary": "one sentence, plain text, for the post list preview",
   "tags": ["2 to 4 short lowercase tags"],
   "body_markdown": "the full draft post body in markdown, NOT including the title as a heading",
-  "questions": ["question 1", "question 2", "... {question_count} total"]
+  "questions": ["question 1", "question 2", "... {question_count} total"],
+  "linkedin_teaser": "one punchy sentence, no hashtags, no emoji"
 }}"""
 
 
@@ -547,7 +553,7 @@ def run_research():
     prompt = build_research_prompt(recent_posts, today)
     draft = call_claude(prompt, use_web_search=True)
 
-    for field in ("title", "summary", "tags", "body_markdown", "questions"):
+    for field in ("title", "summary", "tags", "body_markdown", "questions", "linkedin_teaser"):
         if field not in draft:
             sys.exit(f"ERROR: model response missing required field '{field}'")
 
@@ -556,7 +562,9 @@ def run_research():
     save_pending(draft)
 
     questions_text = "\n".join(f"{i+1}. {q}" for i, q in enumerate(draft["questions"]))
-    body = f"""Today's draft topic: {draft['title']}
+    body = f"""LinkedIn teaser (copy/paste when you share the post): {draft['linkedin_teaser']}
+
+Today's draft topic: {draft['title']}
 
 {draft['summary']}
 
