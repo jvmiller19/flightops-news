@@ -84,9 +84,15 @@ STYLE_RULES = """STYLE RULES — these matter as much as the content:
   named author's voice, not an editorial "we."
 - You MAY reference Vincent's real professional background at a general
   level (e.g. "having spent years on the bid-management side of aviation
-  tech deals," "from time spent running global delivery teams," "as a
-  pilot, this is the kind of tool I'd actually want in the cockpit") since
+  tech deals," "from time spent running global delivery teams") since
   those roles are real and verified above.
+- Do NOT explicitly call out that Vincent is a pilot (e.g. "as a pilot,"
+  "as someone who flies," "in the cockpit myself"). His aviation background
+  is already established by the blog's context — calling it out directly in
+  every post is repetitive. It's fine to write with that perspective
+  implicitly; just don't name it.
+- Be concise. Favor a tighter piece over a longer one — cut anything that
+  restates a point already made rather than adding new information.
 - You must NEVER invent a specific anecdote, named deal, customer, dollar
   figure, date, or direct quote and attribute it to Vincent's personal
   experience. Only the general nature of his work (listed above) is fair
@@ -357,8 +363,9 @@ Prefer concrete news (a product launch, an AI deployment, a partnership or
 deal, a notable contract) over generic commentary.
 
 Write a DRAFT of the post in your own words — do not quote source text
-directly beyond a very short phrase here and there. Aim for 400-600 words.
-Structure: a short intro hook, 2-3 sections with subheadings (use ##
+directly beyond a very short phrase here and there. Aim for 300-450 words —
+keep it tight, every paragraph should earn its place. Structure: a short
+intro hook, 2-3 sections with subheadings (use ##
 markdown), and a short closing thought. Leave the closing thought light —
 it will be revised afterward to incorporate Vincent's own personal take, so
 don't make this draft's ending feel too final or conclusive. End with a
