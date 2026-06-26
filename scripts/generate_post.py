@@ -404,6 +404,17 @@ below — not a different topic area. Still pick a real, fresh, in-scope
 story; just frame and structure it through today's lens.
 """
 
+    # Friday is the opinion-piece slot, so Vincent gets more questions to
+    # give more direct input into the stronger take.
+    is_friday = today.weekday() == 4
+    question_count = "up to 5" if is_friday else "2 or 3"
+    question_count_note = (
+        " Since today's post is the Friday opinion piece, lean toward the "
+        "higher end of that range (up to 5) so his answers can carry more "
+        "of the piece's point of view."
+        if is_friday else ""
+    )
+
     return f"""You write a daily blog post for a blog about: {THEME}
 
 {VOICE}
@@ -444,13 +455,13 @@ don't make this draft's ending feel too final or conclusive. End with a
 "## Sources" section listing the names of the publications/companies
 referenced (no need for full URLs).
 
-Also write 2 or 3 SHORT, POINTED questions to ask Vincent about this
-specific story — designed so his quick answers (multiple choice or a short
-free-text answer, a sentence or two at most) can be woven into the post as
-his personal commentary. Good questions probe his actual opinion or
+Also write {question_count} SHORT, POINTED questions to ask Vincent about
+this specific story — designed so his quick answers (multiple choice or a
+short free-text answer, a sentence or two at most) can be woven into the
+post as his personal commentary. Good questions probe his actual opinion or
 experience-informed read on the news (e.g. "Does this deal surprise you, or does it look inevitable given the trend? (Surprising / Inevitable / Mixed)",
 "Is this the kind of capability your old delivery teams would have wanted
-sooner — yes/no and why in a sentence?"). Avoid generic or vague questions.
+sooner — yes/no and why in a sentence?"). Avoid generic or vague questions.{question_count_note}
 
 Respond with ONLY a single JSON object as your final message — no preamble,
 no explanation of your research process, no markdown code fences, nothing
@@ -461,7 +472,7 @@ with }}, in exactly this shape:
   "summary": "one sentence, plain text, for the post list preview",
   "tags": ["2 to 4 short lowercase tags"],
   "body_markdown": "the full draft post body in markdown, NOT including the title as a heading",
-  "questions": ["question 1", "question 2", "optional question 3"]
+  "questions": ["question 1", "question 2", "... {question_count} total"]
 }}"""
 
 
