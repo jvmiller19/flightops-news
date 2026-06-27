@@ -452,8 +452,12 @@ intro hook, 2-3 sections with subheadings (use ##
 markdown), and a short closing thought. Leave the closing thought light —
 it will be revised afterward to incorporate Vincent's own personal take, so
 don't make this draft's ending feel too final or conclusive. End with a
-"## Sources" section listing the names of the publications/companies
-referenced (no need for full URLs).
+"## Sources" section listing every publication/company referenced, each as
+a markdown link to the actual source URL where you found it (e.g. "- [FAA
+Newsroom](https://www.faa.gov/...)"). Use the real URL from your web
+search results, not a guessed or generic homepage link. This Sources
+section is required in every post and must be preserved as-is through any
+later revision.
 
 Also write {question_count} SHORT, POINTED questions to ask Vincent about
 this specific story — designed so his quick answers (multiple choice or a
@@ -700,6 +704,11 @@ Incorporate his actual answers naturally into the post as his own voice —
 do not quote his reply verbatim or refer to "questions" or "answers"
 explicitly; it should read as commentary he simply included while writing.
 Do not fabricate anything beyond what his reply conveys.
+
+The draft body ends with a "## Sources" section listing linked citations.
+Keep that section exactly as it appears in the draft, unchanged, at the end
+of your revised body_markdown — do not drop it, shorten it, or remove the
+links.
 
 Also write a one-line "linkedin_teaser" — a punchy, scroll-stopping single
 sentence Vincent could post on LinkedIn to draw attention to this finished
