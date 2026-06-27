@@ -29,5 +29,6 @@ Honeywell Aerospace going independent lands in a week when the industry is alrea
 A newly independent Honeywell Aerospace entering the market with a clean balance sheet and dedicated investor attention is potentially a more capable competitor in the digital flight ops space — or a more attractive acquisition target, depending on how the next few years play out. Either way, for airlines evaluating long-term technology partnerships, this is a moment worth watching closely before new contracts get signed.
 
 ## Sources
-- Honeywell / SEC Form 8-K and Information Statement (filed June 15, 2026)
-- Honeywell Aerospace Inc. Form 10-12B/A (SEC EDGAR)
+- [Honeywell Aerospace Inc. — Form 8-K (FY2026) — SEC EDGAR](https://www.sec.gov/Archives/edgar/data/0002089271/000162828026043193/exhibit991-informationstat.htm)
+- [Honeywell Aerospace Inc. — Form 10-12B/A (FY2026) — SEC EDGAR](https://www.sec.gov/Archives/edgar/data/0002089271/000162828026041399/exhibit991-10x12ba2.htm)
+- [New SEC filing offers fresh glimpse into Honeywell aerospace spinoff — Engineering.com](https://www.engineering.com/new-sec-filing-offers-fresh-glimpse-into-honeywell-aerospace-spinoff/)

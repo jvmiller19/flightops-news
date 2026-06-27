@@ -43,4 +43,6 @@ The picture that emerges from San Diego is nuanced but directionally clear: AI i
 For vendors pitching AI-powered flight planning, dispatch optimization, or crew decision support to airlines right now, that's the conversation you need to be ready for. Don't lead with the algorithm. Lead with how your integration story handles the airport code renaming edge case.
 
 ## Sources
-- Aerospace America / AIAA Aviation Forum (published June 19, 2026)
+- [AI, Assurance, and the Future of Aviation Operations — Aerospace America / AIAA](https://aerospaceamerica.aiaa.org/institute/ai-assurance-and-the-future-of-aviation-operations/)
+- [Reliable Robotics and Albuquerque Aviation Department Collaborate on FAA Advanced Air Mobility Safety Program](https://www.eplaneai.com/news/reliable-robotics-and-albuquerque-aviation-department-collaborate-on-faa-advanced-air-mobility-safety-program)
+- [Reliable Robotics Advances Autonomous Regional Air Cargo Future Through FAA Pilot Program — Cargo Newswire](https://cargonewswire.com/reliable-robotics-advances-autonomous-regional-air-cargo-future-through-faa-pilot-program/)

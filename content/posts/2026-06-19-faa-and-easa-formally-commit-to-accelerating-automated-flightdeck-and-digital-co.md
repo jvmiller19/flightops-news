@@ -35,6 +35,7 @@ This joint statement doesn't solve that overnight. Words on paper from regulator
 I'll add one more thing: the commitment to modernize simulator training for automated environments is long overdue. The gap between how automated today's aircraft are and how we train pilots to handle that automation is real. Regulators acknowledging it formally — and committing to fix it — is worth noting.
 
 ## Sources
-- EASA Newsroom (easa.europa.eu)
-- FAA Newsroom (faa.gov)
-- American Association of Airport Executives (AAAE) — 2026 FAA-EASA International Aviation Safety Conference
+- [FAA and EASA Pledge Cooperation for the New Era of Aviation — FAA Newsroom](https://www.faa.gov/newsroom/faa-and-easa-pledge-cooperation-new-era-aviation)
+- [FAA and EASA pledge cooperation for the new era of aviation — EASA Newsroom](https://www.easa.europa.eu/en/newsroom-and-events/press-releases/faa-and-easa-pledge-cooperation-new-era-aviation)
+- [Press Release: FAA, EASA pledge cooperation for new era of aviation — Runway Girl Network](https://runwaygirlnetwork.com/2026/06/faa-easa-pledge-cooperation-for-new-era-of-aviation/)
+- [FAA-EASA International Aviation Safety Conference — American Association of Airport Executives](https://aaae.org/aviationsafety)

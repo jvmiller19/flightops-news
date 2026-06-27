@@ -34,11 +34,9 @@ ASI has gone from a 150-person Boston startup to the centerpiece of U.S. airspac
 
 ## Sources
 
-- PRNewswire (ASI press release, June 22, 2026)
-- Reuters / Yahoo Finance (June 22, 2026)
-- Aviation Week / Aviation Daily (June 16, 2026)
-- AVweb (June 19, 2026)
-- Flying Magazine (June 18–19, 2026)
-- The Air Current (June 2026)
-- CAPA – Centre for Aviation (June 16, 2026)
-- The Next Web (May 2026)
+- [ASI Selected by FAA to Modernize the National Airspace System — PR Newswire](https://www.prnewswire.com/news-releases/asi-selected-by-faa-to-modernize-the-national-airspace-system-302806855.html)
+- [Get SMART: FAA Picks ASI for Predictive Air Traffic Management — Yahoo / FLYING Magazine](https://www.yahoo.com/news/us/articles/smart-faa-picks-asi-predictive-210605515.html)
+- [FAA Picks ASI For Air Traffic Management Software — AVweb](https://avweb.com/aviation-news/faa-picks-asi-for-air-traffic-management/)
+- [Get SMART: FAA Picks ASI for Predictive Air Traffic Management — FLYING Magazine](https://www.flyingmag.com/smart-faa-contract-asi-air-traffic-management/)
+- [FAA picks ASI for $875M AI-enabled airspace-management system — AeroTime](https://www.aerotime.aero/articles/faa-asi-smart-airspace-management-contract)
+- [Palantir, Thales, and a startup are competing to build the FAA's predictive air traffic AI — The Next Web](https://thenextweb.com/news/palantir-thales-air-space-intelligence-faa-smart-ai-air-traffic)

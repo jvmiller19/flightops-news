@@ -31,10 +31,8 @@ In this architecture, <cite index="51-2,51-3">rather than limiting software to a
 The structural merger of Navblue and Skywise is the quiet foundational move that makes the grander vision possible. Getting flight planning, aircraft health data, and ground operations onto a single, unified digital thread is the prerequisite for everything that comes next — from AI-assisted dispatch to, eventually, aircraft that update their own flight management logic mid-route. The industry is watching to see whether a single vendor can actually deliver on that promise at scale.
 
 ## Sources
-- Airbus Newsroom (airbus.com)
-- AeroMorning
-- FlightGlobal
-- AeronauticsMagazine (AirMag.aero)
-- Skywise (skywise.com)
-- Runway Girl Network
-- ASD News
+- [Airbus unveils Skywise subsidiary, integrating Navblue and Skywise digital services solutions — Airbus Newsroom](https://www.airbus.com/en/newsroom/press-releases/2026-04-airbus-unveils-skywise-subsidiary-integrating-navblue-and-skywise-digital-services-solutions)
+- [Airbus Merging flight operations specialist subsidiary Navblue with Skywise digital solutions — AeroMorning](https://aeromorning.com/en/airbus-merging-flight-operations-specialist-subsidiary-navblue-with-skywise-digital-solutions/)
+- [Press Release: Airbus unveils Skywise subsidiary, integrating Navblue — Runway Girl Network](https://runwaygirlnetwork.com/2026/04/airbus-unveils-skywise-subsidiary/)
+- [Airbus Unveils Skywise Subsidiary, Integrating Navblue and Skywise Digital Services Solutions — ASD News](https://www.asdnews.com/news/aerospace/2026/04/02/airbus-unveils-skywise-subsidiary-integrating-navblue-skywise-digital-services-solutions)
+- [Airbus unveils Skywise subsidiary, integrating Navblue and Skywise digital solutions — Skywise Newsroom](https://www.skywise.com/en/newsroom/press-releases/2026-04-airbus-unveils-skywise-subsidiary-integrating-navblue-and-skywise-digital-solutions)
