@@ -33,3 +33,10 @@ It's useful to step back and look at how the pieces fit together right now. <cit
 What the hearing clarified is that the U.S. isn't building one modernization project. It's trying to coordinate several overlapping ones — infrastructure, AI software, sensing technology, and data governance — simultaneously and at speed. Whether that coordination actually happens at the pace the administration is projecting is the real question worth watching.
 
 The Senate hearing was a useful reality check, not a rebuke of the direction. The direction looks right. The sequencing is where I'd want to probe further.
+
+## Sources
+- [Close Calls: Improving Safety Across the National Airspace System — Senate Commerce Committee](https://www.commerce.senate.gov/press/rep/release/close-calls-improving-safety-across-the-national-airspace-system/)
+- [Chairman Moran Leads Hearing to Examine Recent Close Calls & Efforts to Ensure Aviation Safety](https://www.moran.senate.gov/public/index.cfm/news-releases?id=D8DDA00C-669A-4D38-A123-A1BE62F7C552)
+- ["Hundreds" Of Near Misses In US Airspace Every Day, Airlines For America CEO Tells Congress — Simple Flying](https://simpleflying.com/hundreds-near-misses-us-airspace-airlines-for-america-congress/)
+- [Get SMART: FAA Picks ASI for Predictive Air Traffic Management — FLYING Magazine](https://www.flyingmag.com/smart-faa-contract-asi-air-traffic-management/)
+- [ASI Selected by FAA to Modernize the National Airspace System — PR Newswire](https://www.prnewswire.com/news-releases/asi-selected-by-faa-to-modernize-the-national-airspace-system-302806855.html)
