@@ -3,7 +3,7 @@ languageCode = "en-us"
 title = "FlightOps.News"
 
 [params]
-  description = "The trusted voice on what's currently innovating Digital Flight Operations"
+  description = "The trusted voice on what's currently emerging in Digital Flight Operations Technology"
 
 [markup.goldmark.renderer]
   unsafe = true
