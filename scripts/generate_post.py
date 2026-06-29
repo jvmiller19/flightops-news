@@ -206,16 +206,25 @@ def call_claude(prompt, use_web_search=True):
     if use_web_search:
         body["tools"] = [{"type": "web_search_20250305", "name": "web_search"}]
 
-    response = requests.post(
-        API_URL,
-        headers={
-            "Content-Type": "application/json",
-            "x-api-key": api_key,
-            "anthropic-version": "2023-06-01",
-        },
-        json=body,
-        timeout=120,
-    )
+    # Web search calls can involve multiple search rounds and occasionally
+    # run long; retry once on timeout before giving up.
+    for attempt in range(2):
+        try:
+            response = requests.post(
+                API_URL,
+                headers={
+                    "Content-Type": "application/json",
+                    "x-api-key": api_key,
+                    "anthropic-version": "2023-06-01",
+                },
+                json=body,
+                timeout=280,
+            )
+            break
+        except requests.exceptions.ReadTimeout:
+            if attempt == 1:
+                raise
+            print("Claude API call timed out, retrying once...")
     response.raise_for_status()
     data = response.json()
 
