@@ -79,7 +79,14 @@ a { color: var(--sky); }
   color: #C7D3E3;
   margin: 0.5rem 0 0;
   font-size: 0.95rem;
-  max-width: 34ch;
+  max-width: 60ch;
+  white-space: nowrap;
+}
+
+@media (max-width: 600px) {
+  .site-tagline {
+    white-space: normal;
+  }
 }
 
 .site-header .flight-path-rule {
