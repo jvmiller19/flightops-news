@@ -8,7 +8,7 @@ layout: "single"
   <img src="/images/profile.jpg" alt="John Vincent Miller" class="profile-photo">
 </div>
 
-Vincent Miller is the Owner and Editor of FlightOps.News.
+Vincent Miller is the Founder and Editor of FlightOps.News.
 
 Vincent is an aviation leader with more than 15 years of experience in the aviation tech industry. His career spans various functions including flight planning, digital cockpit, aviation communications, and navigational data with a track record that includes multi-million-dollar B2B deals, global product deployments, and go-to-market strategy for some of the most recognized names in aviation technology.
 
