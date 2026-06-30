@@ -722,7 +722,8 @@ links.
 Also write a one-line "linkedin_teaser" — a punchy, scroll-stopping single
 sentence Vincent could post on LinkedIn to draw attention to this finished
 article (not just a restatement of the title; give it a hook, and reflect
-his actual take if it sharpens the hook). No hashtags, no emoji.
+his actual take if it sharpens the hook), followed by 3-5 relevant hashtags
+on the same line (e.g. #AviationTechnology #FlightOps). No emoji.
 
 Respond with ONLY a single JSON object as your final message — no preamble,
 no markdown code fences, nothing before or after the JSON. Your very last
@@ -732,7 +733,7 @@ message must start with {{ and end with }}, in exactly this shape:
   "summary": "one sentence, plain text, for the post list preview",
   "tags": ["2 to 4 short lowercase tags"],
   "body_markdown": "the full REVISED post body in markdown, NOT including the title as a heading",
-  "linkedin_teaser": "one punchy sentence, no hashtags, no emoji"
+  "linkedin_teaser": "one punchy sentence followed by 3-5 relevant hashtags, no emoji"
 }}"""
 
 
