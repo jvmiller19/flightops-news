@@ -1,5 +1,5 @@
 {{ define "main" }}
-<h1 class="page-heading">Latest News</h1>
+<h1 class="page-heading">Emerging Trends</h1>
 <ul class="post-list">
   {{ range (where .Site.RegularPages "Type" "posts").ByDate.Reverse }}
   <li class="post-card">
