@@ -44,7 +44,13 @@ THEME = (
     "technology; customer-facing/passenger technology such as inflight "
     "wifi, entertainment systems, or cabin experience. If your research "
     "surfaces a story in one of the out-of-scope areas, discard it and "
-    "search again for something in scope rather than writing about it."
+    "search again for something in scope rather than writing about it. "
+    "GLOBAL SCOPE — this blog covers flight operations technology "
+    "worldwide, not just the US. Do not default to US/FAA news out of "
+    "habit. Actively look for and rotate in stories from European "
+    "(EASA, Airbus, European carriers), Asia-Pacific, Middle Eastern, and "
+    "other international airlines, regulators, and vendors. Over a given "
+    "week/month the blog should not read as US-centric."
 )
 
 VOICE = (
