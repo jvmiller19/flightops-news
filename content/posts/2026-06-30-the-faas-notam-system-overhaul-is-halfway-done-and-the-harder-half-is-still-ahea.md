@@ -1,0 +1,43 @@
+---
+title: "The FAA's NOTAM System Overhaul Is Halfway Done — and the Harder Half Is Still Ahead"
+date: 2026-06-30
+tags: ["notam", "faa", "flight dispatch", "aviation technology"]
+summary: "The FAA completed phase one of its NOTAM modernization ahead of schedule, but the retirement of the Federal NOTAM System and the downstream benefits for dispatch and EFB platforms depend entirely on what comes next."
+draft: false
+---
+
+The FAA retired its US NOTAM System (USNS) in April after a successful overnight cutover to the new cloud-based NOTAM Management Service (NMS), <cite index="65-5">completing phase one of the modernization effort at what DOT described as "record speed."</cite> The original target for this work was late 2027. Getting here roughly 18 months early is genuinely notable — but the headline efficiency story risks obscuring something dispatch and OCC teams should be paying closer attention to: the second legacy system, the Federal NOTAM System (FNS), is still running, and <cite index="91-1">its retirement to leave NMS as the single authoritative source for all NOTAMs is now scheduled for later in 2026.</cite> That means any airline or vendor still touching FNS origination workflows has unfinished business.
+
+## How This Actually Touches the Dispatch Desk
+
+NOTAMs are, in one sense, a simple concept — <cite index="36-8,36-9">they communicate temporary changes such as runway closures, airspace restrictions, and obstructions to pilots and flight planners, and more than 4 million are issued annually.</cite> In practice, that volume is precisely the problem. Dispatchers releasing a single long-haul flight can be looking at dozens of relevant NOTAMs across the departure airport, destination, alternates, and the route corridor itself, many of which are operationally irrelevant but still have to be reviewed and signed off. The cognitive load problem isn't new — but it's gotten harder to ignore as network complexity has grown.
+
+The FNS, which dates to the same era as the USNS, exists largely as a separate origination and distribution interface used by airports, heliports, and other NOTAM-issuing authorities — essentially the supply-side of the NOTAM ecosystem. <cite index="68-4">The transition to NMS enables retirement of both legacy user interfaces: the US NOTAM System and the Federal NOTAM System.</cite> Retiring both matters because data flowing from two separate legacy origination pipelines introduces fragmentation risk that a single cloud-based backbone eliminates. <cite index="68-8">The new cloud-based system is being supplied by vendor CGI Federal.</cite>
+
+For dispatchers, the near-term experience has been deliberately quiet. <cite index="97-6,97-7">After the April cutover, NOTAMs obtained through the FNS page and third-party providers now route through NMS, though operators weren't expected to notice any differences.</cite> That transparency was the right call for an infrastructure migration of this size — you don't want flight operations teams debugging novel NOTAM behavior during an active operational day. But transparency at cutover doesn't mean the upgrade is without consequence.
+
+## What Phase Two Actually Unlocks
+
+Here's what I think is underappreciated about this transition: the modernization isn't primarily about infrastructure resilience, even though resilience is the stated headline. The deeper opportunity is in what a clean, cloud-native, API-accessible NOTAM backbone makes possible downstream. <cite index="114-13">As digital infrastructure is modernized, the FAA expects third-party software providers to offer the ability for consumers to customize and identify the prioritization of NOTAMs</cite> — something the legacy systems were structurally unable to support at scale.
+
+That's a meaningful signal for the EFB and dispatch platform market. <cite index="114-21,114-22">The NMS will be built on a modern, flexible architecture that will enable more rapid updates to implement new policy changes once published — and the FAA is focused on producing digital NOTAM data for third-party vendors to deliver advanced features such as graphical depiction and plain language information.</cite> Products like AI-powered NOTAM summarization, context-aware relevance filtering, and graphical route overlays have been technically feasible for years; the bottleneck has been reliable, structured data access. NMS changes that bottleneck substantially.
+
+For flight operations officers, though, I'd characterize the near-term impact as real but modest. The infrastructure is cleaner and more resilient, and that matters — but the day-to-day dispatch experience doesn't change much until EFB and dispatch platform vendors actually layer intelligent filtering and plain-language tooling on top of what NMS makes available. That's where the workflow transformation comes from, and it's mostly still ahead of us. The AI-powered filtering in particular strikes me as a genuinely significant change for dispatch desks, not a nice-to-have feature. Having spent time on both the product and delivery sides of flight ops software, I've watched the NOTAM review burden grow without a structural solution. NMS gives vendors the foundation to finally build one.
+
+The path from here also includes an eventual format change. <cite index="44-10">The transition to ICAO's NOTAM format is currently planned for late 2027 or early 2028,</cite> but the FAA has been clear that format migration won't happen until phase two of NMS is complete. That sequencing makes sense — you can't enforce a new data standard on a system that's still bridging two legacy pipelines. <cite index="40-5,40-6,40-7">The FAA will adopt the ICAO NOTAM format and replace the current domestic format, but the current focus is implementing NMS and onboarding all systems and individuals involved — and the ICAO schedule will be determined once that transition is complete.</cite>
+
+When phase two is fully live, the question of which category of flight ops software benefits most from API-quality digital NOTAM access is probably the wrong framing. EFB platforms building smarter preflight briefings, dispatch systems applying relevance filtering, and flight planning engines incorporating NOTAM constraints into route optimization all stand to gain in meaningfully different ways. The structured data access NMS provides is general-purpose enough that the limiting factor becomes each vendor's willingness to invest in what's now buildable rather than any architectural constraint on which category wins.
+
+On the pace of all this: given what I know about the complexity of decommissioning legacy government infrastructure while keeping operational continuity intact, the FAA's progress here is actually impressive. The 2023 NOTAM outage grounded flights for 90 minutes — <cite index="98-26,98-27">a nationwide collapse grounding flights across the country for the first time since September 11, 2001, with nearly 11,000 flights affected.</cite> That incident made the fragility visible in a way that years of internal advocacy hadn't. What NMS phase two completes is the unglamorous, essential work of turning that crisis into a durable fix — and, eventually, the foundation for the kind of intelligent NOTAM tooling that dispatch desks actually need. The FNS retirement slipping from "late spring" to "later in 2026" is worth watching, but it doesn't change my read on whether the overall effort is moving at an appropriate pace. It is.
+
+The question of whether the FNS retirement sticks to its revised 2026 timeline remains the near-term thing to track.
+
+## Sources
+- [FAA Newsroom — Phase One Overhaul Completion](https://www.faa.gov/newsroom/trumps-transportation-secretary-sean-p-duffy-completes-phase-one-overhaul-critical-pilot)
+- [FlightGlobal — FAA Prepares for Full NOTAM Transition After Initial Phase Completed](https://www.flightglobal.com/archive/2026/05/us-faa-prepares-for-full-notam-system-transition-after-initial-phase-completed/)
+- [NBAA — FAA Plans April 18 Changeover to New NOTAM System](https://nbaa.org/aircraft-operations/airspace/faa-plans-april-18-changeover-to-new-notam-system/)
+- [General Aviation News — First Phase of FAA NOTAM Overhaul Completed](https://generalaviationnews.com/2026/05/13/first-phase-of-notam-overhaul-completed/)
+- [US Transport News — FAA Completes First Phase of NOTAM Overhaul](https://www.ustransportnews.com/post/faa-completes-first-phase-of-notam-overhaul-more-than-a-year-ahead-of-schedule)
+- [AOPA — FAA Begins Testing New NOTAM System](https://www.aopa.org/news-and-media/all-news/2025/october/09/faa-begins-testing-new-notam-system)
+- [FAA NMS FAQs](https://www.faa.gov/about/initiatives/notam/faqs)
+- [FAA NMS Portal](https://nms.aim.faa.gov/)
