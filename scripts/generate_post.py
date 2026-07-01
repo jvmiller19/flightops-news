@@ -206,7 +206,7 @@ def call_claude(prompt, use_web_search=True):
 
     body = {
         "model": MODEL,
-        "max_tokens": 4000,
+        "max_tokens": 8000,
         "messages": [{"role": "user", "content": prompt}],
     }
     if use_web_search:
@@ -444,7 +444,12 @@ the last 7 days (on or after {week_ago.isoformat()}). Use web search and
 check the actual publish date of your sources before choosing a story. Do
 not use older news just because it's relevant — if you can't find something
 genuinely new from the last 7 days, search again with different terms
-rather than falling back to stale news.
+rather than falling back to stale news. Budget your research: once you've
+found ONE story that clearly qualifies, stop searching and write the post
+— do not keep re-evaluating additional candidate stories once you have a
+qualifying one, and do not narrate your research process at length. You
+have a limited response budget, so move to writing the final JSON output
+promptly once a story is chosen.
 
 NO-REPEAT RULE:
 {history_clause}
