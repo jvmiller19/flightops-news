@@ -438,18 +438,24 @@ story; just frame and structure it through today's lens.
 
 TODAY'S DATE: {today.isoformat()}
 {day_theme_clause}
-FRESHNESS REQUIREMENT — STRICT:
-Pick ONE specific, genuinely newsworthy story that broke or was reported in
-the last 7 days (on or after {week_ago.isoformat()}). Use web search and
-check the actual publish date of your sources before choosing a story. Do
-not use older news just because it's relevant — if you can't find something
-genuinely new from the last 7 days, search again with different terms
-rather than falling back to stale news. Budget your research: once you've
-found ONE story that clearly qualifies, stop searching and write the post
-— do not keep re-evaluating additional candidate stories once you have a
-qualifying one, and do not narrate your research process at length. You
-have a limited response budget, so move to writing the final JSON output
-promptly once a story is chosen.
+FRESHNESS REQUIREMENT:
+Prefer ONE specific, genuinely newsworthy story that broke or was reported
+in the last 7 days (on or after {week_ago.isoformat()}). Use web search and
+check the actual publish date of your sources before choosing a story.
+
+HARD RULE ON DECIDING — this is more important than finding a perfect
+story: You get a MAXIMUM of 4 web searches total for this task. Track your
+search count. After your 4th search (or sooner, as soon as you have any
+in-scope candidate from the last 10 days), STOP searching immediately and
+write the post about the freshest genuinely in-scope candidate you found —
+even if it's 8-10 days old rather than a perfect 7, and even if you're not
+100% certain it's the single best possible option. A good post about a
+slightly-less-than-ideal-but-real story beats no post at all. Do not keep
+re-searching to find something better once you have any valid candidate
+in hand. Do not narrate extended back-and-forth deliberation between
+candidates — pick one and move on. You MUST end your response with the
+JSON object; running out of budget without producing it is the one
+unacceptable outcome.
 
 NO-REPEAT RULE:
 {history_clause}
