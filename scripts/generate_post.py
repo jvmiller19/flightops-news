@@ -477,6 +477,17 @@ significant new outcome). If you do cover a follow-up like this:
 Prefer concrete news (a product launch, an AI deployment, a partnership or
 deal, a notable contract) over generic commentary.
 
+EMERGING PLAYERS — actively prioritize: give real weight to startups,
+new entrants, and lesser-known vendors building novel solutions in this
+space, not just the large, established incumbents (Airbus/NAVBLUE, Boeing,
+Honeywell, major airlines, FAA/EASA, etc.). When you have a genuine choice
+between an incumbent story and a startup/emerging-player story that are
+both fresh and in-scope, lean toward covering the emerging player — that's
+often where the most interesting flight-ops-tech innovation is actually
+happening, and it's underrepresented in mainstream aviation press. This
+doesn't override the freshness or scope rules, but should shape which
+story you pick when there's a real choice.
+
 Write a DRAFT of the post in your own words — do not quote source text
 directly beyond a very short phrase here and there. Aim for 300-450 words —
 keep it tight, every paragraph should earn its place. Structure: a short
