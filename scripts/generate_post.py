@@ -488,6 +488,15 @@ happening, and it's underrepresented in mainstream aviation press. This
 doesn't override the freshness or scope rules, but should shape which
 story you pick when there's a real choice.
 
+CUSTOMER-SIDE ANGLE — actively include: alongside vendor/product-launch
+news, also look for and cover news from the buyer/operator side — an
+airline launching a project to upgrade a flight operations system,
+issuing an RFP or starting a bid process to evaluate vendors, selecting or
+switching a dispatch/OCC/flight-planning provider, or publicly describing
+its own technology roadmap or adoption plans. This demand-side angle is
+just as valid a story as a vendor announcement and should be searched for
+specifically, not just vendor press releases.
+
 Write a DRAFT of the post in your own words — do not quote source text
 directly beyond a very short phrase here and there. Aim for 300-450 words —
 keep it tight, every paragraph should earn its place. Structure: a short
