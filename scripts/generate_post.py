@@ -183,6 +183,7 @@ DAY_THEMES = {
 REPO_ROOT = os.path.join(os.path.dirname(__file__), "..")
 POSTS_DIR = os.path.join(REPO_ROOT, "content", "posts")
 PENDING_DIR = os.path.join(REPO_ROOT, ".pending")
+POLLS_PATH = os.path.join(REPO_ROOT, "data", "polls.json")
 API_URL = "https://api.anthropic.com/v1/messages"
 MODEL = "claude-sonnet-4-6"
 DRAFT_EXPIRY_HOURS = 24
@@ -210,6 +211,37 @@ def get_recent_posts(limit=60):
                 "summary": summary_match.group(1) if summary_match else "",
             })
     return posts
+
+
+def load_polls():
+    if not os.path.exists(POLLS_PATH):
+        return []
+    with open(POLLS_PATH, "r", encoding="utf-8") as fh:
+        return json.load(fh)
+
+
+def save_polls(polls):
+    with open(POLLS_PATH, "w", encoding="utf-8") as fh:
+        json.dump(polls, fh, indent=2)
+        fh.write("\n")
+
+
+def get_next_unused_poll():
+    for poll in load_polls():
+        if poll.get("used_in_post") is None:
+            return poll
+    return None
+
+
+def mark_poll_used(poll_id, post_date):
+    polls = load_polls()
+    changed = False
+    for poll in polls:
+        if poll["id"] == poll_id:
+            poll["used_in_post"] = post_date
+            changed = True
+    if changed:
+        save_polls(polls)
 
 
 def call_claude(prompt, use_web_search=True):
@@ -443,6 +475,23 @@ story; just frame and structure it through today's lens.
         if is_friday else ""
     )
 
+    poll_clause = ""
+    poll = get_next_unused_poll()
+    if poll:
+        poll_clause = f"""
+VINCENT'S OWN POLL DATA — available if relevant:
+Vincent personally ran an industry poll and has this real, unpublished
+result available: "{poll['question']}" — {poll['results']}
+If it's a natural fit for today's story{" and opinion-piece angle" if is_friday else ""},
+work this poll into the piece as a real data point from Vincent's own
+research (it is genuine, not fabricated — safe to cite directly, e.g. "I
+recently polled industry professionals on X, and the results were...").
+Only use it if it actually fits the story; don't force it in — it's fine
+to skip it and save it for a better-fitting future post. If you do use it,
+add "used_poll_id": "{poll['id']}" to your JSON response; otherwise omit
+that field entirely.
+"""
+
     return f"""You write a daily blog post for a blog about: {THEME}
 
 {VOICE}
@@ -450,7 +499,7 @@ story; just frame and structure it through today's lens.
 {STYLE_RULES}
 
 TODAY'S DATE: {today.isoformat()}
-{day_theme_clause}
+{day_theme_clause}{poll_clause}
 FRESHNESS REQUIREMENT:
 Prefer ONE specific, genuinely newsworthy story that broke or was reported
 in the last 7 days (on or after {week_ago.isoformat()}). Use web search and
@@ -542,7 +591,8 @@ with }}, in exactly this shape:
   "tags": ["2 to 4 short lowercase tags"],
   "body_markdown": "the full draft post body in markdown, NOT including the title as a heading",
   "questions": ["question 1", "question 2", "... {question_count} total"],
-  "email_brief": "2-4 sentences of background/context and current relevance, for the question email only"
+  "email_brief": "2-4 sentences of background/context and current relevance, for the question email only",
+  "used_poll_id": "only include this key if you actually used the poll data above in the post"
 }}"""
 
 
@@ -840,6 +890,9 @@ def run_finalize():
         write_post(final_post, date_str)
         os.remove(path)
         published_any = True
+
+        if draft.get("used_poll_id"):
+            mark_poll_used(draft["used_poll_id"], date_str)
 
         send_email(
             f"Published: {final_post['title']}",
