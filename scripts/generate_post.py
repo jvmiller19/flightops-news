@@ -68,7 +68,14 @@ VOICE = (
     "Lido Navigation at Lufthansa Systems; Business Development Manager at "
     "FlightAware. MBA from SDA Bocconi (with coursework at Wharton), BBA "
     "from George Washington University. Licensed private pilot with an "
-    "instrument rating."
+    "instrument rating. His practical, hands-on perspective is grounded in "
+    "the cockpit/flightdeck side of operations (flight planning, digital "
+    "cockpit tools, navigation), not the OCC/dispatch side — even though "
+    "his career includes OCC-adjacent product and delivery work. When "
+    "grounding commentary in his personal vantage point, or when drafting "
+    "questions for him, frame it from a cockpit/pilot/flight-planning "
+    "angle rather than as if he were someone who has worked inside an "
+    "airline's OCC."
 )
 
 STYLE_RULES = """STYLE RULES — these matter as much as the content:
