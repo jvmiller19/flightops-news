@@ -35,3 +35,6 @@ On the integration side, adding a real-time crowdsourced layer like SkyPath on t
 Whether this El Niño season ends up being as turbulent as the research projects is genuinely uncertain. But the dispatch and weather-routing infrastructure question it raises doesn't go away when the atmospheric pattern eventually shifts back.
 
 ## Sources
+- [Advanced Real-Time Turbulence Data App with New GPS Spoofing & Jamming Alerts and AI-Driven Insights Demo Webinar — SkyPath / AircraftIT](https://www.aircraftit.com/webinars/advanced-real-time-turbulence-data-app-with-new-gps-jamming-ai-demo-webinar/)
+- [SkyPath, Your Ride Quality Partner](https://skypath.io/)
+- [SkyPath Blog: Understanding Turbulence](https://skypath.io/blog/understanding-turbulence)

@@ -244,6 +244,15 @@ def mark_poll_used(poll_id, post_date):
         save_polls(polls)
 
 
+def has_valid_sources_section(body_markdown):
+    """A real Sources section: the '## Sources' heading followed by at
+    least one markdown link ([text](url))."""
+    match = re.search(r"##\s*Sources\b(.*)", body_markdown, re.IGNORECASE | re.DOTALL)
+    if not match:
+        return False
+    return bool(re.search(r"\[[^\]]+\]\(https?://[^)]+\)", match.group(1)))
+
+
 def call_claude(prompt, use_web_search=True):
     api_key = os.environ.get("ANTHROPIC_API_KEY")
     if not api_key:
@@ -671,6 +680,23 @@ def run_research():
         if field not in draft:
             sys.exit(f"ERROR: model response missing required field '{field}'")
 
+    if not has_valid_sources_section(draft["body_markdown"]):
+        print("Draft is missing a valid linked Sources section — retrying once with a corrective prompt.")
+        retry_prompt = prompt + (
+            "\n\nIMPORTANT CORRECTION: your previous attempt did not include "
+            "a valid \"## Sources\" section with markdown links at the end "
+            "of body_markdown. You MUST include one this time — a \"## "
+            "Sources\" heading followed by a bullet list where every item "
+            "is a markdown link, e.g. \"- [FAA Newsroom](https://www.faa.gov/...)\". "
+            "Use real URLs from your web search results."
+        )
+        draft = call_claude(retry_prompt, use_web_search=True)
+        for field in ("title", "summary", "tags", "body_markdown", "questions", "email_brief"):
+            if field not in draft:
+                sys.exit(f"ERROR: retried model response missing required field '{field}'")
+        if not has_valid_sources_section(draft["body_markdown"]):
+            sys.exit("ERROR: retried draft still missing a valid linked Sources section — aborting rather than publishing without citations.")
+
     draft["date"] = today_str
     draft["created_at"] = datetime.datetime.now(datetime.timezone.utc).isoformat()
     save_pending(draft)
@@ -886,6 +912,17 @@ def run_finalize():
         for field in ("title", "summary", "tags", "body_markdown", "linkedin_teaser"):
             if field not in final_post:
                 sys.exit(f"ERROR: finalize response missing required field '{field}'")
+
+        if not has_valid_sources_section(final_post["body_markdown"]):
+            # Safety net: the finalize revision dropped the Sources section
+            # despite instructions. Recover it from the original draft
+            # rather than publishing without citations.
+            original_match = re.search(r"##\s*Sources\b.*", draft["body_markdown"], re.IGNORECASE | re.DOTALL)
+            if original_match and has_valid_sources_section(draft["body_markdown"]):
+                print("Finalize output dropped the Sources section — restoring it from the original draft.")
+                final_post["body_markdown"] = final_post["body_markdown"].rstrip() + "\n\n" + original_match.group().strip()
+            else:
+                sys.exit(f"ERROR: finalized post for {date_str} has no valid Sources section, and the original draft didn't either — aborting rather than publishing without citations.")
 
         write_post(final_post, date_str)
         os.remove(path)
