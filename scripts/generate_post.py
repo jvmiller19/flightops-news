@@ -526,6 +526,12 @@ experience-informed read on the news (e.g. "Does this deal surprise you, or does
 "Is this the kind of capability your old delivery teams would have wanted
 sooner — yes/no and why in a sentence?"). Avoid generic or vague questions.{question_count_note}
 
+Also write an "email_brief" — 2-4 sentences (longer and more substantive
+than the one-line "summary" field) giving Vincent a quick but real
+orientation before he answers the questions: what the background/context
+of this story is, and why it's relevant to current trends in flight ops
+technology right now. This is for the email only, not the published post.
+
 Respond with ONLY a single JSON object as your final message — no preamble,
 no explanation of your research process, no markdown code fences, nothing
 before or after the JSON. Your very last message must start with {{ and end
@@ -535,7 +541,8 @@ with }}, in exactly this shape:
   "summary": "one sentence, plain text, for the post list preview",
   "tags": ["2 to 4 short lowercase tags"],
   "body_markdown": "the full draft post body in markdown, NOT including the title as a heading",
-  "questions": ["question 1", "question 2", "... {question_count} total"]
+  "questions": ["question 1", "question 2", "... {question_count} total"],
+  "email_brief": "2-4 sentences of background/context and current relevance, for the question email only"
 }}"""
 
 
@@ -610,7 +617,7 @@ def run_research():
     prompt = build_research_prompt(recent_posts, today)
     draft = call_claude(prompt, use_web_search=True)
 
-    for field in ("title", "summary", "tags", "body_markdown", "questions"):
+    for field in ("title", "summary", "tags", "body_markdown", "questions", "email_brief"):
         if field not in draft:
             sys.exit(f"ERROR: model response missing required field '{field}'")
 
@@ -621,7 +628,7 @@ def run_research():
     questions_text = "\n".join(f"{i+1}. {q}" for i, q in enumerate(draft["questions"]))
     body = f"""Today's draft topic: {draft['title']}
 
-{draft['summary']}
+{draft['email_brief']}
 
 I'd like your take before this publishes. Just reply to this email with
 your answers (any format is fine, e.g. "1) B  2) yes, because...") and
