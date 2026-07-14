@@ -22,6 +22,7 @@ import re
 import json
 import glob
 import sys
+import subprocess
 import smtplib
 import imaplib
 import email
@@ -378,6 +379,29 @@ def post_exists_for_date(date_str):
     return bool(glob.glob(os.path.join(POSTS_DIR, f"{date_str}-*.md")))
 
 
+def remote_pending_or_post_exists(date_str):
+    """Re-check against the remote (not just the local checkout) right
+    before sending the question email. Two triggers firing close together
+    can both pass the earlier local check before either has pushed, so this
+    catches a lost race and prevents a duplicate email from going out."""
+    subprocess.run(
+        ["git", "fetch", "origin", "main", "-q"],
+        cwd=REPO_ROOT, check=False,
+    )
+    for path in (f".pending/{date_str}.json",):
+        result = subprocess.run(
+            ["git", "cat-file", "-e", f"origin/main:{path}"],
+            cwd=REPO_ROOT,
+        )
+        if result.returncode == 0:
+            return True
+    result = subprocess.run(
+        ["git", "ls-tree", "-r", "--name-only", "origin/main", "content/posts/"],
+        cwd=REPO_ROOT, capture_output=True, text=True, check=False,
+    )
+    return any(name.startswith(f"content/posts/{date_str}-") for name in result.stdout.splitlines())
+
+
 def send_email(subject, body):
     server = os.environ.get("MAIL_SERVER")
     port = int(os.environ.get("MAIL_PORT", "587"))
@@ -696,6 +720,11 @@ def run_research():
                 sys.exit(f"ERROR: retried model response missing required field '{field}'")
         if not has_valid_sources_section(draft["body_markdown"]):
             sys.exit("ERROR: retried draft still missing a valid linked Sources section — aborting rather than publishing without citations.")
+
+    if remote_pending_or_post_exists(today_str):
+        print(f"Another run already committed a draft or post for {today_str} while this run "
+              f"was researching — discarding this run's output rather than emailing a duplicate.")
+        return
 
     draft["date"] = today_str
     draft["created_at"] = datetime.datetime.now(datetime.timezone.utc).isoformat()
