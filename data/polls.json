@@ -4,6 +4,13 @@
     "added": "2026-07-04",
     "question": "Where should AI in the cockpit go first?",
     "results": "40% said maintenance and documents, 20% said pilot decision support, 40% said AI should be kept out of the cockpit",
+    "used_in_post": "2026-07-08"
+  },
+  {
+    "id": "2026-07-poll-ai-adoption-barrier",
+    "added": "2026-07-15",
+    "question": "What's the biggest barrier to AI adoption in aviation ops?",
+    "results": "16% said regulatory certification timelines, 20% said operator trust and culture, 23% said data quality & integration, 41% said liability & accountability",
     "used_in_post": null
   }
 ]
