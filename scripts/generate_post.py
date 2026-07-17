@@ -245,6 +245,12 @@ def mark_poll_used(poll_id, post_date):
         save_polls(polls)
 
 
+class DraftJSONError(Exception):
+    """Raised when the model's response can't be parsed as the expected
+    JSON object (e.g. an unescaped quote inside a string value broke it).
+    Callers can catch this and retry with a corrective prompt."""
+
+
 def has_valid_sources_section(body_markdown):
     """A real Sources section: the '## Sources' heading followed by at
     least one markdown link ([text](url))."""
@@ -339,7 +345,7 @@ def call_claude(prompt, use_web_search=True):
                         except json.JSONDecodeError:
                             break
 
-    sys.exit(f"ERROR: Could not parse JSON from model output:\n{full_text}")
+    raise DraftJSONError(full_text)
 
 
 def slugify(title):
@@ -698,28 +704,58 @@ def run_research():
 
     recent_posts = get_recent_posts()
     prompt = build_research_prompt(recent_posts, today)
-    draft = call_claude(prompt, use_web_search=True)
+    required_fields = ("title", "summary", "tags", "body_markdown", "questions", "email_brief")
 
-    for field in ("title", "summary", "tags", "body_markdown", "questions", "email_brief"):
-        if field not in draft:
-            sys.exit(f"ERROR: model response missing required field '{field}'")
+    json_correction = (
+        "\n\nIMPORTANT CORRECTION: your previous attempt produced malformed "
+        "JSON (most likely an unescaped double-quote character inside a "
+        "string value, e.g. writing a quoted phrase with \" characters "
+        "directly instead of escaping them as \\\"). Regenerate the full "
+        "response, being careful that every string value is valid JSON — "
+        "escape any double quotes that appear inside body_markdown, "
+        "title, summary, etc."
+    )
+    sources_correction = (
+        "\n\nIMPORTANT CORRECTION: your previous attempt did not include "
+        "a valid \"## Sources\" section with markdown links at the end "
+        "of body_markdown. You MUST include one this time — a \"## "
+        "Sources\" heading followed by a bullet list where every item "
+        "is a markdown link, e.g. \"- [FAA Newsroom](https://www.faa.gov/...)\". "
+        "Use real URLs from your web search results."
+    )
 
-    if not has_valid_sources_section(draft["body_markdown"]):
-        print("Draft is missing a valid linked Sources section — retrying once with a corrective prompt.")
-        retry_prompt = prompt + (
-            "\n\nIMPORTANT CORRECTION: your previous attempt did not include "
-            "a valid \"## Sources\" section with markdown links at the end "
-            "of body_markdown. You MUST include one this time — a \"## "
-            "Sources\" heading followed by a bullet list where every item "
-            "is a markdown link, e.g. \"- [FAA Newsroom](https://www.faa.gov/...)\". "
-            "Use real URLs from your web search results."
-        )
-        draft = call_claude(retry_prompt, use_web_search=True)
-        for field in ("title", "summary", "tags", "body_markdown", "questions", "email_brief"):
-            if field not in draft:
-                sys.exit(f"ERROR: retried model response missing required field '{field}'")
-        if not has_valid_sources_section(draft["body_markdown"]):
-            sys.exit("ERROR: retried draft still missing a valid linked Sources section — aborting rather than publishing without citations.")
+    draft = None
+    current_prompt = prompt
+    for attempt in range(2):
+        try:
+            candidate = call_claude(current_prompt, use_web_search=True)
+        except DraftJSONError as exc:
+            if attempt == 1:
+                sys.exit(f"ERROR: model output still not valid JSON after retry:\n{exc}")
+            print("Model output was not valid JSON — retrying once with a corrective prompt.")
+            current_prompt = prompt + json_correction
+            continue
+
+        missing = [f for f in required_fields if f not in candidate]
+        if missing:
+            if attempt == 1:
+                sys.exit(f"ERROR: retried model response still missing required field(s): {missing}")
+            print(f"Model response missing required field(s) {missing} — retrying once.")
+            current_prompt = prompt + json_correction
+            continue
+
+        if not has_valid_sources_section(candidate["body_markdown"]):
+            if attempt == 1:
+                sys.exit("ERROR: retried draft still missing a valid linked Sources section — aborting rather than publishing without citations.")
+            print("Draft is missing a valid linked Sources section — retrying once with a corrective prompt.")
+            current_prompt = prompt + sources_correction
+            continue
+
+        draft = candidate
+        break
+
+    if draft is None:
+        sys.exit("ERROR: failed to produce a valid draft after retry.")
 
     if remote_pending_or_post_exists(today_str):
         print(f"Another run already committed a draft or post for {today_str} while this run "
@@ -936,7 +972,22 @@ def run_finalize():
 
         print(f"Found reply for {date_str}, finalizing post.")
         prompt = build_finalize_prompt(draft, reply_text)
-        final_post = call_claude(prompt, use_web_search=False)
+        try:
+            final_post = call_claude(prompt, use_web_search=False)
+        except DraftJSONError:
+            print("Finalize output was not valid JSON — retrying once with a corrective prompt.")
+            correction = (
+                "\n\nIMPORTANT CORRECTION: your previous attempt produced "
+                "malformed JSON (most likely an unescaped double-quote "
+                "character inside a string value). Regenerate the full "
+                "response, being careful that every string value is valid "
+                "JSON — escape any double quotes that appear inside "
+                "body_markdown, title, summary, etc."
+            )
+            try:
+                final_post = call_claude(prompt + correction, use_web_search=False)
+            except DraftJSONError as exc:
+                sys.exit(f"ERROR: finalize output still not valid JSON after retry:\n{exc}")
 
         for field in ("title", "summary", "tags", "body_markdown", "linkedin_teaser"):
             if field not in final_post:
