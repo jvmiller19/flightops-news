@@ -98,6 +98,10 @@ STYLE_RULES = """STYLE RULES — these matter as much as the content:
     saying anything concrete
   - listy parallel structure in prose (e.g. three clauses in a row all
     shaped the same way for rhetorical effect)
+- TERMINOLOGY CAPITALIZATION — always spell these correctly: "NOTAM"
+  (all caps, never "notam" or "Notam"); plural is "NOTAMs" (capital NOTAM,
+  lowercase s). Similarly, "EFB", "OCC", "ATC", "ATM", "FAA", "EASA",
+  "ICAO", "IFR", "VFR" are always all-caps.
 - Write in first-person singular when giving Vincent's own commentary or
   referencing past posts (e.g. "as I reported last week," "I think," "in my
   experience") — never first-person plural ("we," "our"). This is a single

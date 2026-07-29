@@ -6,7 +6,7 @@ summary: "The Aviobook and Meteomatics integration announced at this year's EMEA
 draft: false
 ---
 
-There's a tendency to treat EFB platform competition as a features race — who has the better chart rendering, the cleaner notam filter, the slicker fuel-calculation interface. What the Aviobook and Meteomatics integration announced at this year's EMEA Airline & Aerospace Flight Operations IT Conference actually points to is something architecturally more interesting: the question of whose weather data lives natively inside the operational workflow, rather than sitting one browser tab away.
+There's a tendency to treat EFB platform competition as a features race — who has the better chart rendering, the cleaner NOTAM filter, the slicker fuel-calculation interface. What the Aviobook and Meteomatics integration announced at this year's EMEA Airline & Aerospace Flight Operations IT Conference actually points to is something architecturally more interesting: the question of whose weather data lives natively inside the operational workflow, rather than sitting one browser tab away.
 
 ## What Aviobook and Meteomatics Are Actually Building
 
