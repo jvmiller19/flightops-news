@@ -738,29 +738,34 @@ def run_research():
 
     draft = None
     current_prompt = prompt
-    for attempt in range(2):
+    json_retried = False
+    sources_retried = False
+    for attempt in range(3):
         try:
             candidate = call_claude(current_prompt, use_web_search=True)
         except DraftJSONError as exc:
-            if attempt == 1:
+            if json_retried:
                 sys.exit(f"ERROR: model output still not valid JSON after retry:\n{exc}")
             print("Model output was not valid JSON — retrying once with a corrective prompt.")
             current_prompt = prompt + json_correction
+            json_retried = True
             continue
 
         missing = [f for f in required_fields if f not in candidate]
         if missing:
-            if attempt == 1:
+            if json_retried:
                 sys.exit(f"ERROR: retried model response still missing required field(s): {missing}")
             print(f"Model response missing required field(s) {missing} — retrying once.")
             current_prompt = prompt + json_correction
+            json_retried = True
             continue
 
         if not has_valid_sources_section(candidate["body_markdown"]):
-            if attempt == 1:
+            if sources_retried:
                 sys.exit("ERROR: retried draft still missing a valid linked Sources section — aborting rather than publishing without citations.")
             print("Draft is missing a valid linked Sources section — retrying once with a corrective prompt.")
             current_prompt = prompt + sources_correction
+            sources_retried = True
             continue
 
         draft = candidate
