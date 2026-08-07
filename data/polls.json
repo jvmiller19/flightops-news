@@ -20,4 +20,11 @@
     "results": "27% said aircraft certification, 37% said traffic management infrastructure, 20% said public trust & adoption, 17% said airport/vertiport access",
     "used_in_post": "2026-07-31"
   }
+  ,{
+    "id": "2026-08-poll-flight-data-analytics-value",
+    "added": "2026-08-06",
+    "question": "Where does flight data analytics deliver the most value today?",
+    "results": "59% said fuel efficiency and savings, 5% said pilot performance feedback, 24% said safety and risk monitoring, 11% said maintenance and reliability",
+    "used_in_post": null
+  }
 ]
