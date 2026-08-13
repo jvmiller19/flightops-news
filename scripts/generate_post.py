@@ -57,6 +57,8 @@ THEME = (
     "airline data infrastructure or 'operations' broadly — PSS is a "
     "commercial/distribution system, not a flight operations system, and "
     "is out of scope regardless of framing. "
+    "TODAY ONLY — do not write about ForeFlight or Jeppesen ForeFlight; "
+    "pick a completely different in-scope topic. "
     "NO HARDWARE — this blog is about software and data, not physical "
     "equipment. Do not write about avionics hardware, cockpit hardware "
     "upgrades, aircraft displays, line-fit/retrofit hardware programs, "
