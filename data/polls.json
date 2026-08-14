@@ -26,12 +26,12 @@
     "question": "Where does flight data analytics deliver the most value today?",
     "results": "59% said fuel efficiency and savings, 5% said pilot performance feedback, 24% said safety and risk monitoring, 11% said maintenance and reliability",
     "used_in_post": "2026-08-10"
-  }
-  ,{
+  },
+  {
     "id": "2026-08-poll-ai-safety-impact",
     "added": "2026-08-13",
     "question": "Where will AI have the biggest safety impact in aviation?",
     "results": "17% said preflight planning & briefing, 17% said ATC flow & conflict management, 14% said cockpit decision support, 52% said maintenance & anomaly detection",
-    "used_in_post": null
+    "used_in_post": "2026-08-14"
   }
 ]
