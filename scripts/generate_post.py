@@ -560,6 +560,12 @@ that field entirely.
 
 TODAY'S DATE: {today.isoformat()}
 {day_theme_clause}{poll_clause}
+TOPIC DIRECTIVE (TODAY ONLY): Write specifically about Cathay Technologies
+commercializing its Electronic Flight Folder (EFF) to external airlines,
+with Cargolux as the first external customer. Research the Cathay Pacific /
+Cathay Technologies EFF platform, the Cargolux deal, and what it signals
+about airline-built flight ops software entering the commercial market.
+
 FRESHNESS REQUIREMENT:
 Prefer ONE specific, genuinely newsworthy story that broke or was reported
 in the last 7 days (on or after {week_ago.isoformat()}). Use web search and
@@ -991,7 +997,19 @@ def run_finalize():
             )
             continue
 
-        reply_text = find_reply(date_str)
+        publish_after = draft.get("publish_after")
+        if publish_after:
+            publish_after_dt = datetime.datetime.fromisoformat(publish_after)
+            if now < publish_after_dt:
+                print(f"Draft for {date_str} is held until {publish_after} — skipping for now.")
+                continue
+
+        pre_answers = draft.get("pre_answers")
+        if pre_answers:
+            reply_text = pre_answers
+            print(f"Using pre-loaded answers for {date_str}.")
+        else:
+            reply_text = find_reply(date_str)
         if not reply_text:
             print(f"No reply yet for {date_str} pending draft.")
             continue
