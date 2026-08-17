@@ -56,5 +56,5 @@ jobs:
             echo "No new pending draft to commit."
           else
             git commit -m "Auto: pending draft $(date -u +%Y-%m-%d)"
-            git push
+            git pull --rebase origin main && git push
           fi
