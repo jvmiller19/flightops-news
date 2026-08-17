@@ -560,12 +560,6 @@ that field entirely.
 
 TODAY'S DATE: {today.isoformat()}
 {day_theme_clause}{poll_clause}
-TOPIC DIRECTIVE (TODAY ONLY): Write specifically about Cathay Technologies
-commercializing its Electronic Flight Folder (EFF) to external airlines,
-with Cargolux as the first external customer. Research the Cathay Pacific /
-Cathay Technologies EFF platform, the Cargolux deal, and what it signals
-about airline-built flight ops software entering the commercial market.
-
 FRESHNESS REQUIREMENT:
 Prefer ONE specific, genuinely newsworthy story that broke or was reported
 in the last 7 days (on or after {week_ago.isoformat()}). Use web search and
