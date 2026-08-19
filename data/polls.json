@@ -34,4 +34,11 @@
     "results": "17% said preflight planning & briefing, 17% said ATC flow & conflict management, 14% said cockpit decision support, 52% said maintenance & anomaly detection",
     "used_in_post": "2026-08-14"
   }
+  ,{
+    "id": "2026-08-poll-operational-data-blind-spot",
+    "added": "2026-08-19",
+    "question": "Where is the biggest operational data blind spot in aviation today?",
+    "results": "53% said ground and ramp operations, 31% said aircraft parts & MRO, 4% said terminal & passenger flow, 12% said crew & staff movement",
+    "used_in_post": null
+  }
 ]
