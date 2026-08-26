@@ -41,4 +41,11 @@
     "results": "53% said ground and ramp operations, 31% said aircraft parts & MRO, 4% said terminal & passenger flow, 12% said crew & staff movement",
     "used_in_post": null
   }
+  ,{
+    "id": "2026-08-poll-electric-regional-aviation-hurdle",
+    "added": "2026-08-25",
+    "question": "What's the biggest hurdle to commercial electric regional aviation?",
+    "results": "27% said aircraft certification, 20% said charging infrastructure, 7% said ops and dispatch software, 45% said economic viability at scale",
+    "used_in_post": null
+  }
 ]
