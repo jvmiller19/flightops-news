@@ -376,7 +376,13 @@ def slugify(title):
     return slug[:80]
 
 
+def strip_cite_tags(text):
+    """Remove any (cite index="...">...</cite> artifacts the model may leave in."""
+    return re.sub(r'\(cite index="[^"]*">|</cite>', '', text)
+
+
 def write_post(post, date_str):
+    post["body_markdown"] = strip_cite_tags(post["body_markdown"])
     slug = slugify(post["title"])
     filename = f"{date_str}-{slug}.md"
     path = os.path.join(POSTS_DIR, filename)
