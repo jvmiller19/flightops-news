@@ -48,4 +48,12 @@
     "results": "27% said aircraft certification, 20% said charging infrastructure, 7% said ops and dispatch software, 45% said economic viability at scale",
     "used_in_post": null
   }
+  ,{
+    "id": "2026-09-poll-best-flight-ops-software-builder",
+    "added": "2026-09-01",
+    "question": "Who builds the best flight ops software?",
+    "results": "46% said dedicated industry vendors, 38% said airlines building in-house, 13% said big tech cloud providers, 4% said aviation AI startups",
+    "vincent_note": "The 4% for aviation AI startups shows the industry is still heavily skeptical of AI-native players despite the hype — a meaningful contrast worth referencing in AI adoption discussions.",
+    "used_in_post": null
+  }
 ]
