@@ -734,10 +734,6 @@ def run_research():
     if post_exists_for_date(today_str):
         print("A post for today already exists — skipping research.")
         return
-    if os.path.exists(pending_path(today_str)):
-        print("A pending draft for today already exists — skipping research.")
-        return
-
     recent_posts = get_recent_posts()
     prompt = build_research_prompt(recent_posts, today)
     required_fields = ("title", "summary", "tags", "body_markdown", "linkedin_teaser")
