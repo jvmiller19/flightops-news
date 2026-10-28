@@ -1,4 +1,4 @@
-name: Generate Daily Post (Research Phase)
+name: Generate Daily Post
 
 on:
   schedule:
@@ -36,7 +36,7 @@ jobs:
       - name: Install dependencies
         run: pip install -r scripts/requirements.txt
 
-      - name: Research topic, draft post, email Vincent the questions
+      - name: Research topic and publish post
         env:
           ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
           MAIL_SERVER: ${{ secrets.MAIL_SERVER }}
@@ -46,15 +46,15 @@ jobs:
           MAIL_TO: ${{ secrets.MAIL_TO }}
         run: python scripts/generate_post.py research
 
-      - name: Commit pending draft
+      - name: Commit published post
         run: |
           git config user.name "blog-bot"
           git config user.email "blog-bot@users.noreply.github.com"
-          mkdir -p .pending
-          git add .pending/
+          git add content/posts/ data/polls.json
           if git diff --cached --quiet; then
-            echo "No new pending draft to commit."
+            echo "No new post to commit."
           else
-            git commit -m "Auto: pending draft $(date -u +%Y-%m-%d)"
+            git commit -m "Auto: finalize post / clear pending drafts $(date -u +%Y-%m-%d)"
             git pull --rebase origin main && git push
           fi
+

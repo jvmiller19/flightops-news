@@ -376,6 +376,16 @@ def slugify(title):
     return slug[:80]
 
 
+def load_knowledge_base():
+    """Load Vincent's compiled knowledge/opinions file if it exists."""
+    path = os.path.join(os.path.dirname(__file__), "..", "data", "knowledge.md")
+    path = os.path.normpath(path)
+    if os.path.exists(path):
+        with open(path, "r", encoding="utf-8") as fh:
+            return fh.read()
+    return ""
+
+
 def strip_cite_tags(text):
     """Remove any (cite index="...">...</cite> artifacts the model may leave in."""
     return re.sub(r'\(cite index="[^"]*">|</cite>', '', text)
@@ -558,6 +568,19 @@ add "used_poll_id": "{poll['id']}" to your JSON response; otherwise omit
 that field entirely.
 """
 
+    knowledge_base = load_knowledge_base()
+    knowledge_clause = ""
+    if knowledge_base:
+        knowledge_clause = f"""
+VINCENT'S KNOWLEDGE BASE — his expressed opinions and perspectives:
+Use this to write his personal commentary directly into the post, in his
+voice, without needing to ask him questions. Draw on whichever entries
+are relevant to today's story. Do not fabricate opinions beyond what is
+stated here — stay grounded in what he has actually expressed.
+
+{knowledge_base}
+"""
+
     return f"""You write a daily blog post for a blog about: {THEME}
 
 {VOICE}
@@ -565,7 +588,7 @@ that field entirely.
 {STYLE_RULES}
 
 TODAY'S DATE: {today.isoformat()}
-{day_theme_clause}{poll_clause}
+{day_theme_clause}{poll_clause}{knowledge_clause}
 FRESHNESS REQUIREMENT:
 Prefer ONE specific, genuinely newsworthy story that broke or was reported
 in the last 7 days (on or after {week_ago.isoformat()}). Use web search and
@@ -619,33 +642,20 @@ its own technology roadmap or adoption plans. This demand-side angle is
 just as valid a story as a vendor announcement and should be searched for
 specifically, not just vendor press releases.
 
-Write a DRAFT of the post in your own words — do not quote source text
-directly beyond a very short phrase here and there. Aim for 300-450 words —
-keep it tight, every paragraph should earn its place. Structure: a short
-intro hook, 2-3 sections with subheadings (use ##
-markdown), and a short closing thought. Leave the closing thought light —
-it will be revised afterward to incorporate Vincent's own personal take, so
-don't make this draft's ending feel too final or conclusive. End with a
-"## Sources" section listing every publication/company referenced, each as
-a markdown link to the actual source URL where you found it (e.g. "- [FAA
-Newsroom](https://www.faa.gov/...)"). Use the real URL from your web
-search results, not a guessed or generic homepage link. This Sources
-section is required in every post and must be preserved as-is through any
-later revision.
+Write the COMPLETE, FINAL post — not a draft awaiting review. Incorporate
+Vincent's personal commentary and perspective directly from his knowledge
+base above, woven naturally into the body as his own first-person voice.
+Aim for 350-500 words. Structure: a short intro hook, 2-3 sections with
+## subheadings, and a closing section that includes his personal take.
+End with a "## Sources" section listing every publication/company
+referenced, each as a markdown link to the actual source URL where you
+found it. Use the real URL from your web search results, not a guessed
+or generic homepage link. The Sources section is required in every post.
 
-Also write {question_count} SHORT, POINTED questions to ask Vincent about
-this specific story — designed so his quick answers (multiple choice or a
-short free-text answer, a sentence or two at most) can be woven into the
-post as his personal commentary. Good questions probe his actual opinion or
-experience-informed read on the news (e.g. "Does this deal surprise you, or does it look inevitable given the trend? (Surprising / Inevitable / Mixed)",
-"Is this the kind of capability your old delivery teams would have wanted
-sooner — yes/no and why in a sentence?"). Avoid generic or vague questions.{question_count_note}
-
-Also write an "email_brief" — 2-4 sentences (longer and more substantive
-than the one-line "summary" field) giving Vincent a quick but real
-orientation before he answers the questions: what the background/context
-of this story is, and why it's relevant to current trends in flight ops
-technology right now. This is for the email only, not the published post.
+Also write a one-line "linkedin_teaser" — a punchy, scroll-stopping
+sentence Vincent could post on LinkedIn to draw attention to this article
+(not just a restatement of the title; give it a hook and reflect his
+actual take), followed by 3-5 relevant hashtags on the same line. No emoji.
 
 Respond with ONLY a single JSON object as your final message — no preamble,
 no explanation of your research process, no markdown code fences, nothing
@@ -655,9 +665,8 @@ with }}, in exactly this shape:
   "title": "string, specific and concrete, no clickbait",
   "summary": "one sentence, plain text, for the post list preview",
   "tags": ["2 to 4 short lowercase tags"],
-  "body_markdown": "the full draft post body in markdown, NOT including the title as a heading",
-  "questions": ["question 1", "question 2", "... {question_count} total"],
-  "email_brief": "2-4 sentences of background/context and current relevance, for the question email only",
+  "body_markdown": "the full final post body in markdown, NOT including the title as a heading",
+  "linkedin_teaser": "one punchy sentence followed by 3-5 relevant hashtags, no emoji",
   "used_poll_id": "only include this key if you actually used the poll data above in the post"
 }}"""
 
@@ -731,7 +740,7 @@ def run_research():
 
     recent_posts = get_recent_posts()
     prompt = build_research_prompt(recent_posts, today)
-    required_fields = ("title", "summary", "tags", "body_markdown", "questions", "email_brief")
+    required_fields = ("title", "summary", "tags", "body_markdown", "linkedin_teaser")
 
     json_correction = (
         "\n\nIMPORTANT CORRECTION: your previous attempt produced malformed "
@@ -791,30 +800,28 @@ def run_research():
 
     if remote_pending_or_post_exists(today_str):
         print(f"Another run already committed a draft or post for {today_str} while this run "
-              f"was researching — discarding this run's output rather than emailing a duplicate.")
+              f"was researching — discarding this run's output rather than publishing a duplicate.")
         return
 
-    draft["date"] = today_str
-    draft["created_at"] = datetime.datetime.now(datetime.timezone.utc).isoformat()
-    save_pending(draft)
+    post_path = write_post(draft, today_str)
+    print(f"Post written: {post_path}")
 
-    questions_text = "\n".join(f"{i+1}. {q}" for i, q in enumerate(draft["questions"]))
-    body = f"""Today's draft topic: {draft['title']}
+    if "used_poll_id" in draft:
+        mark_poll_used(draft["used_poll_id"], today_str)
 
-{draft['email_brief']}
+    with open(os.environ.get("GITHUB_OUTPUT", os.devnull), "a") as gho:
+        gho.write("published=true\n")
 
-I'd like your take before this publishes. Just reply to this email with
-your answers (any format is fine, e.g. "1) B  2) yes, because...") and
-I'll weave them into the post:
+    body = f"""Published: {draft['title']}
 
-{questions_text}
+{draft['summary']}
 
-If I don't hear back within {DRAFT_EXPIRY_HOURS} hours, I'll skip
-publishing today's post rather than guess at your take.
+LinkedIn teaser:
+{draft['linkedin_teaser']}
 
-— Auto-generated by flightops.news pipeline {ref_token(today_str)}"""
+— Auto-generated by flightops.news pipeline"""
 
-    send_email(f"Your input needed on today's post — {today_str} {ref_token(today_str)}", body)
+    send_email(f"Published: {draft['title']} — {today_str}", body)
 
 
 # ---------------------------------------------------------------------------
