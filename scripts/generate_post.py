@@ -215,8 +215,8 @@ DRAFT_EXPIRY_HOURS = 24
 # Shared helpers
 # ---------------------------------------------------------------------------
 
-def get_recent_posts(limit=60):
-    """Pull title/date/summary from existing posts so we can avoid repeats
+def get_recent_posts(limit=90):
+    """Pull title/date/summary/tags from existing posts so we can avoid repeats
     and recognize genuine follow-ups vs. duplicate coverage."""
     files = sorted(glob.glob(os.path.join(POSTS_DIR, "*.md")), reverse=True)[:limit]
     posts = []
@@ -226,11 +226,16 @@ def get_recent_posts(limit=60):
         title_match = re.search(r'^title:\s*"?(.*?)"?\s*$', content, re.MULTILINE)
         date_match = re.search(r'^date:\s*(\S+)\s*$', content, re.MULTILINE)
         summary_match = re.search(r'^summary:\s*"?(.*?)"?\s*$', content, re.MULTILINE)
+        tags_match = re.search(r'^tags:\s*\[(.+?)\]\s*$', content, re.MULTILINE)
         if title_match:
+            tags_str = ""
+            if tags_match:
+                tags_str = tags_match.group(1).replace('"', '').replace("'", "")
             posts.append({
                 "title": title_match.group(1),
                 "date": date_match.group(1) if date_match else "unknown",
                 "summary": summary_match.group(1) if summary_match else "",
+                "tags": tags_str,
             })
     return posts
 
@@ -519,7 +524,7 @@ def build_research_prompt(recent_posts, today):
     history_clause = "No posts published yet, so any qualifying story is fine."
     if recent_posts:
         lines = [
-            f'- "{p["title"]}" (published {p["date"]}): {p["summary"]}'
+            f'- "{p["title"]}" (published {p["date"]}, tags: {p["tags"]}): {p["summary"]}'
             for p in recent_posts
         ]
         history_clause = (
@@ -611,13 +616,23 @@ unacceptable outcome.
 NO-REPEAT RULE:
 {history_clause}
 
-Do NOT cover a topic/company/story already listed above UNLESS there has
-been a genuinely major new development since that post (e.g. a deal that
-was rumored is now signed, a beta has now gone GA, a deployment had a
-significant new outcome). If you do cover a follow-up like this:
-- Say explicitly in the post that this is an update to a story covered
-  before, and briefly note what's new vs. what was already known.
-- Otherwise, pick a different, fresh topic entirely.
+HARD NO-REPEAT RULES — these are strict, not guidelines:
+1. Do NOT cover the same company again if it appeared in any post in the
+   last 90 days — even if the angle or story is different. Check the title,
+   tags, and summary of every post above carefully. If a company name
+   appears anywhere in that list within the past 90 days, skip it entirely
+   and find a different story.
+2. Do NOT cover the same topic/theme again within 30 days (e.g. two NOTAM
+   posts, two fuel-efficiency posts, two EFB-challenger posts in the same
+   month).
+3. The only exception to rule 1 is a genuinely major new development that
+   changes the story materially (e.g. a rumored deal is now signed, a beta
+   went GA, a company was acquired). If you invoke this exception, explicitly
+   flag it in the post as an update and state what specifically is new.
+   "They announced another product" or "they raised more money" does NOT
+   qualify as a major new development.
+4. When in doubt, pick a different company. There is no shortage of fresh
+   stories in this space.
 
 Prefer concrete news (a product launch, an AI deployment, a partnership or
 deal, a notable contract) over generic commentary.
