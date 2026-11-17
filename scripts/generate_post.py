@@ -666,6 +666,8 @@ End with a "## Sources" section listing every publication/company
 referenced, each as a markdown link to the actual source URL where you
 found it. Use the real URL from your web search results, not a guessed
 or generic homepage link. The Sources section is required in every post.
+NEVER cite Wikipedia as a source — always find the primary source
+(official statements, company announcements, reputable news outlets).
 
 Also write a one-line "linkedin_teaser" — a punchy, scroll-stopping
 sentence Vincent could post on LinkedIn to draw attention to this article
